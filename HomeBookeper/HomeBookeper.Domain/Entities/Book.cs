@@ -7,6 +7,7 @@ namespace HomeBookeper.Domain.Entities
 	{
 		private readonly string _title;
 		private readonly Author _author;
+
 		private readonly BookValidator _validator;
 
 		public Book(string title, Author author)
@@ -19,9 +20,14 @@ namespace HomeBookeper.Domain.Entities
 
 		public string Title => _title;
 
+		// TODO: make as a collection
 		public Author Author => _author;
 
+		// TODO: have metadata on a book series
 		//public Series Series
+
+		// TODO: make ISBN number a value type
+		public int ISBN { get; set; }
 
 		public ValidationResult Validate() => _validator.Validate(this);
 

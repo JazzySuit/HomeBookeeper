@@ -21,5 +21,9 @@
   <ItemGroup>
     <ProjectReference Include="..\HomeBookeper.Domain\HomeBookeper.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\Books\Commands\UpdateBook\" />
+    <Folder Include="Features\Books\Queries\" />
+  </ItemGroup>
 
 </Project>
