@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using HomeBookeper.Application.Behaviours;
-using HomeBookeper.Application.Features.Products.Commands.CreateProduct;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

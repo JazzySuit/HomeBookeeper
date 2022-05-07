@@ -1,11 +1,15 @@
-﻿namespace HomeBookeper.Domain.Entities;
+﻿using HomeBookeper.Domain.Values;
+
+namespace HomeBookeper.Domain.Entities;
 
 public class FictionBook : Book
 {
-	
-	public FictionBook(string title, Author author)
-		: base(title, author)
+
+	public FictionBook(
+		string title,
+		Isbn isbn)
+		: base(title, isbn)
 	{
-		
+
 	}
 }

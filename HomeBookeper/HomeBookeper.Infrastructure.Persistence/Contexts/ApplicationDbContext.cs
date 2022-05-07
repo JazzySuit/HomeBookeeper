@@ -1,10 +1,8 @@
 ﻿using HomeBookeper.Application.Interfaces;
 using HomeBookeper.Domain.Common;
 using HomeBookeper.Domain.Entities;
+using HomeBookeper.Infrastructure.Persistence.Configurations;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace HomeBookeper.Infrastructure.Persistence.Contexts;
 
@@ -13,9 +11,13 @@ public class ApplicationDbContext : DbContext
 	private readonly IDateTimeService _dateTime;
 	private readonly IAuthenticatedUserService _authenticatedUser;
 
-	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser) : base(options)
+	public ApplicationDbContext(
+		DbContextOptions<ApplicationDbContext> options, 
+		IDateTimeService dateTime, 
+		IAuthenticatedUserService authenticatedUser) 
+		: base(options)
 	{
-		ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+		//ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 		_dateTime = dateTime;
 		_authenticatedUser = authenticatedUser;
 	}
@@ -29,7 +31,7 @@ public class ApplicationDbContext : DbContext
 	public DbSet<FictionBook> FictionBooks { get; set; }
 	public DbSet<NonFictionBook> NonFictionBooks { get; set; }
 
-
+	public DbSet<Author> Authors { get; set; }
 
 
 
@@ -61,6 +63,8 @@ public class ApplicationDbContext : DbContext
 		{
 			decimalProperty.SetColumnType("decimal(18,6)");
 		}
+
+		builder.ApplyConfiguration(new BookEntityConfiguration());
 
 		base.OnModelCreating(builder);
 	}

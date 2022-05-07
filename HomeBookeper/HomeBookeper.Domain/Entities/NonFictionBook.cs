@@ -1,9 +1,13 @@
-﻿namespace HomeBookeper.Domain.Entities;
+﻿using HomeBookeper.Domain.Values;
+
+namespace HomeBookeper.Domain.Entities;
 
 public class NonFictionBook : Book
 {
-	public NonFictionBook(string title, Author author)
-		: base(title, author)
+	public NonFictionBook(
+		string title,
+		Isbn isbn)
+		: base(title, isbn)
 	{
 	}
 }

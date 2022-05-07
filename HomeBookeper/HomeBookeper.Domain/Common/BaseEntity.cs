@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace HomeBookeper.Domain.Common;
 
-namespace HomeBookeper.Domain.Common
+public abstract class BaseEntity
 {
-	public abstract class BaseEntity
-	{
-		public virtual int Id { get; set; }
-	}
+	public virtual int Id { get; set; }
 }

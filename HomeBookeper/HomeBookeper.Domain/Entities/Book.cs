@@ -1,46 +1,23 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
+﻿using HomeBookeper.Domain.Common;
+using HomeBookeper.Domain.Values;
 
-namespace HomeBookeper.Domain.Entities
+namespace HomeBookeper.Domain.Entities;
+
+public abstract class Book : BaseEntity
 {
-	public abstract class Book
+	public Book(string title, 
+		Isbn isbn)
 	{
-		private readonly string _title;
-		private readonly Author _author;
-
-		private readonly BookValidator _validator;
-
-		public Book(string title, Author author)
-		{
-			_title = title;
-			_author = author;
-
-			_validator = new BookValidator();
-		}
-
-		public string Title => _title;
-
-		// TODO: make as a collection
-		public Author Author => _author;
-
-		// TODO: have metadata on a book series
-		//public Series Series
-
-		// TODO: make ISBN number a value type
-		public int ISBN { get; set; }
-
-		public ValidationResult Validate() => _validator.Validate(this);
-
-		internal class BookValidator : AbstractValidator<Book>
-		{
-			public BookValidator()
-			{
-				RuleFor(book => book.Title).NotEmpty();
-				RuleFor(book => book.Author).NotNull();
-				RuleFor(book => book.Author).SetValidator(new AuthorValidator());
-			}
-		}
-
-
+		Title = title;
+		Isbn = isbn;
 	}
+
+	public string Title { get; init; }
+
+	//public ICollection<Author> Authors { get; private set; }
+
+	// TODO: have metadata on a book series
+	//public Series Series
+
+	public Isbn Isbn { get; init; }
 }

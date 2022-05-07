@@ -1,4 +1,6 @@
 ﻿using HomeBookeper.Application.Features.Books.Commands.CreateBook;
+using HomeBookeper.Application.Features.Books.Queries.GetAllBooks;
+using HomeBookeper.Application.Features.Books.Queries.GetBooksById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,15 +10,20 @@ namespace HomeBookeper.WebApi.Controllers.v1;
 public class BookController : BaseApiController
 {
 	[HttpGet]
-	public IEnumerable<string> Get()
+	public async Task<IActionResult> Get([FromQuery] GetAllBooksParameter filter)
 	{
-		return new string[] { "value1", "value2" };
+		return Ok(await Mediator.Send(
+			new GetAllBooksQuery()
+			{
+				PageSize = filter.PageSize,
+				PageNumber = filter.PageNumber
+			}));
 	}
 
 	[HttpGet("{id}")]
-	public string Get(int id)
+	public async Task<IActionResult> Get(int id)
 	{
-		return "value";
+		return Ok(await Mediator.Send(new GetBookByIdQuery { Id = id }));
 	}
 
 	[HttpPost]

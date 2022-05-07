@@ -1,34 +1,28 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
+﻿using HomeBookeper.Domain.Common;
 
 namespace HomeBookeper.Domain.Entities;
 
-public class Author
+public class Author : BaseEntity
 {
-	private readonly string _firstName;
-	private readonly string _lastName;
-	private readonly AuthorValidator _validator;
-
 	public Author(string firstName, string lastName)
 	{
-		_firstName = firstName;
-		_lastName = lastName;
+		if (string.IsNullOrWhiteSpace(firstName))
+		{
+			throw new ArgumentException($"An author must have a {nameof(firstName)}");
+		}
 
-		_validator = new AuthorValidator();
+		if (string.IsNullOrWhiteSpace(lastName))
+		{
+			throw new ArgumentException($"An author must have a {nameof(lastName)}");
+		}
+
+		FirstName = firstName;
+		LastName = lastName;
 	}
 
-	public string FirstName => _firstName;
+	public string FirstName { get; init; }
 
-	public string LastName => _lastName;
+	public string LastName { get; init; }
 
-	public ValidationResult Validate() => _validator.Validate(this);
-}
-
-internal class AuthorValidator : AbstractValidator<Author>
-{
-	public AuthorValidator()
-	{
-		RuleFor(author => author.FirstName).NotEmpty();
-		RuleFor(author => author.LastName).NotEmpty();
-	}
+	//public ICollection<Book>? Books { get; private set; }
 }

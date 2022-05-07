@@ -23,7 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\Books\Commands\UpdateBook\" />
-    <Folder Include="Features\Books\Queries\" />
   </ItemGroup>
 
 </Project>
