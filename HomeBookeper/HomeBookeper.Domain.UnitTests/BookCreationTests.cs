@@ -35,127 +35,163 @@ public class BookCreationTests
 	}
 
 	[Fact]
+	public void Attempting_to_create_an_invalid_isbn_throws_an_exception()
+	{
+		Assert.Throws<ArgumentException>(() => new Isbn(IsbnStandard.Isbn10, 123456));
+	}
+
+	[Fact]
 	public void Can_create_a_valid_childrens_book()
 	{
 		const string title = "kids book";
-		//var authors = GenerateSingleValidAuthorList().ToList();
+		const string publisher = "only kids books";
+		var author = GenerateSingleValidAuthorEnumerable().First();
 		var isbn13 = GenerateIsbn13();
 
-		var kidsBook = new ChildrensBook(title, isbn13);
+		var kidsBookNoAuthor = new Book(
+			title,
+			BookType.ChildrensBook,
+			isbn13,
+			publisher);
 
-		kidsBook.Title.Should().Be(title);
-		//kidsBook.Authors.Count.Should().Be(1);
-		kidsBook.Isbn.Should().Be(isbn13);
+		kidsBookNoAuthor.Title.Should().Be(title);
+		kidsBookNoAuthor.Authors.Count.Should().Be(0);
+		kidsBookNoAuthor.Isbn.Should().Be(isbn13);
+
+		//var kidsBookWithAuthor = new Book(
+		//	title,
+		//	BookType.ChildrensBook,
+		//	isbn13,
+		//	publisher,
+		//	author);
+
+		//kidsBookWithAuthor.Authors.Count.Should().Be(1);
 	}
 
 	[Fact]
 	public void Can_create_a_valid_board_book()
 	{
 		const string title = "kids book";
-		//var authors = GenerateSingleValidAuthorList().ToList();
+		const string publisher = "book publisher";
+		var author = GenerateSingleValidAuthorEnumerable().First();
 		var isbn13 = GenerateIsbn13();
 
-		var boardBook = new BoardBook(title, isbn13);
+		var boardBookNoAuthor = new Book(
+			title,
+			BookType.BoardBook,
+			isbn13,
+			publisher);
 
-		boardBook.Title.Should().Be(title);
-		//boardBook.Authors.Count.Should().Be(1);
-		boardBook.Isbn.Should().Be(isbn13);
+		boardBookNoAuthor.Title.Should().Be(title);
+		boardBookNoAuthor.Authors.Count.Should().Be(0);
+		boardBookNoAuthor.Isbn.Should().Be(isbn13);
+
+		//var boardBookWithAuthor = new Book(
+		//	title,
+		//	BookType.ChildrensBook,
+		//	isbn13,
+		//	publisher,
+		//	author);
+
+		//boardBookWithAuthor.Authors.Count.Should().Be(1);
 	}
 
 	[Fact]
 	public void Can_create_a_valid_fiction_book()
 	{
 		const string title = "kids book";
-		//var authors = GenerateSingleValidAuthorList().ToList();
+		const string publisher = "book publisher";
+		var author = GenerateSingleValidAuthorEnumerable().First();
 		var isbn13 = GenerateIsbn13();
 
-		var fictionBook = new FictionBook(title, isbn13);
+		var fictionBookNoAuthor = new Book(
+			title,
+			BookType.FictionBook,
+			isbn13,
+			publisher);
 
-		fictionBook.Title.Should().Be(title);
-		//fictionBook.Authors.Count.Should().Be(1);
+		fictionBookNoAuthor.Title.Should().Be(title);
+		fictionBookNoAuthor.Authors.Count.Should().Be(0);
+
+		//var fictionBookWithAuthor = new Book(
+		//	title,
+		//	BookType.ChildrensBook,
+		//	isbn13,
+		//	publisher,
+		//	author);
+
+		//fictionBookWithAuthor.Authors.Count.Should().Be(1);
 	}
 
 	[Fact]
 	public void Can_create_a_valid_nonfiction_book()
 	{
 		const string title = "kids book";
-		//var authors = GenerateSingleValidAuthorList().ToList();
+		const string publisher = "book publisher";
+		var author = GenerateSingleValidAuthorEnumerable().First();
 		var isbn13 = GenerateIsbn13();
 
-		var nonFictionBook = new NonFictionBook(title, isbn13);
+		var nonFictionBook = new Book(
+			title,
+			BookType.NonFictionBook,
+			isbn13,
+			publisher);
 
 		nonFictionBook.Title.Should().Be(title);
-		//nonFictionBook.Authors.Count.Should().Be(1);
+		nonFictionBook.Authors.Count.Should().Be(0);
+
+		//var nonFictionBookWithAuthor = new Book(
+		//	title,
+		//	BookType.ChildrensBook,
+		//	isbn13,
+		//	publisher,
+		//	author);
+
+		//nonFictionBookWithAuthor.Authors.Count.Should().Be(1);
 	}
 
 	[Fact]
-	public void A_childrens_book_must_have_a_title_validation_fails_when_no_title_is_given()
+	public void Throw_an_exception_on_initialisation_when_a_book_has_no_title()
 	{
 		const string emptyTitle = "";
-		//var authors = GenerateSingleValidAuthorList().ToList();
+		const string publisher = "book publisher";
 		var isbn13 = GenerateIsbn13();
 
-		var emptyBookTitle = new ChildrensBook(emptyTitle, isbn13);
-
-		emptyBookTitle.Title.Should().Be(emptyTitle);
-		//emptyBookTitle.Authors.Count.Should().Be(1);
+		Assert.Throws<ArgumentException>(() => new Book(
+			emptyTitle,
+			BookType.ChildrensBook,
+			isbn13,
+			publisher));
 	}
 
 	[Fact]
-	public void A_board_book_must_have_a_title_validation_fails_when_no_title_is_given()
+	public void Throw_an_exception_on_initialisation_when_a_book_has_no_isbn()
 	{
-		const string emptyTitle = "";
-		//var authors = GenerateSingleValidAuthorList().ToList();
-		var isbn13 = GenerateIsbn13();
+		const string title = "book title";
+		const string publisher = "book publisher";
+		Isbn isbn13 = null;
 
-		var emptyBookTitle = new BoardBook(emptyTitle, isbn13);
-
-		emptyBookTitle.Title.Should().Be(emptyTitle);
-		//emptyBookTitle.Authors.Count.Should().Be(1);
+		Assert.Throws<ArgumentNullException>(() => new Book(
+			title,
+			BookType.ChildrensBook,
+			isbn13,
+			publisher));
 	}
-
-	[Fact]
-	public void A_fiction_book_must_have_a_title_validation_fails_when_no_title_is_given()
-	{
-		const string emptyTitle = "";
-		//var authors = GenerateSingleValidAuthorList().ToList();
-		var isbn13 = GenerateIsbn13();
-
-		var emptyBookTitle = new FictionBook(emptyTitle, isbn13);
-
-		emptyBookTitle.Title.Should().Be(emptyTitle);
-		//emptyBookTitle.Authors.Count.Should().Be(1);
-	}
-
-	[Fact]
-	public void A_nonfiction_book_must_have_a_title_validation_fails_when_no_title_is_given()
-	{
-		const string emptyTitle = "";
-		//var authors = GenerateSingleValidAuthorList().ToList();
-		var isbn13 = GenerateIsbn13();
-
-		var emptyBookTitle = new NonFictionBook(emptyTitle, isbn13);
-
-		emptyBookTitle.Title.Should().Be(emptyTitle);
-		//emptyBookTitle.Authors.Count.Should().Be(1);
-	}
-
 
 	#region private helper test methods
 
 	private Author GenerateValidAuthor()
 		=> new("Bobs", "Anauthor");
 
-	private IEnumerable<Author> GenerateSingleValidAuthorList()
+	private IEnumerable<Author> GenerateSingleValidAuthorEnumerable()
 	{
 		yield return GenerateValidAuthor();
 	}
 
 	private Isbn GenerateIsbn13()
-		=> new Isbn()
-		{
-			Standard = IsbnStandard.Isbn13,
-			Value = 1234567899123
-		};
+		=> new Isbn(
+			IsbnStandard.Isbn13,
+			1234567899123
+		);
 	#endregion
 }

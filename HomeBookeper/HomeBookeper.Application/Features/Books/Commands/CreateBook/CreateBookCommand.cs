@@ -11,9 +11,15 @@ public class CreateBookCommand : IRequest<Response<int>>
 {
 	public string Title { get; set; }
 
+	public ICollection<Author> Authors { get; set; }
+
 	public Isbn Isbn { get; set; }
 
 	public BookType BookType { get; set; }
+
+	public string Publisher { get; set; }
+
+	public string? Series { get; set; }
 }
 
 public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Response<int>>
@@ -29,19 +35,9 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Respo
 
 	public async Task<Response<int>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
 	{
-		var book = MapToBookType(request);
+		var book = _mapper.Map<Book>(request);
 		await _bookRepository.AddAsync(book);
 		
 		return new Response<int>(book.Id);
 	}
-
-	private Book MapToBookType(CreateBookCommand request)
-		=> request.BookType switch
-		{
-			BookType.BoardBook => _mapper.Map<BoardBook>(request),
-			BookType.ChildrensBook => _mapper.Map<ChildrensBook>(request),
-			BookType.FictionBook => _mapper.Map<FictionBook>(request),
-			BookType.NonFictionBook => _mapper.Map<NonFictionBook>(request),
-			_ => throw new NotImplementedException()
-		};
 }

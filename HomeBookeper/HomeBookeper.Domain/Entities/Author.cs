@@ -24,5 +24,5 @@ public class Author : BaseEntity
 
 	public string LastName { get; init; }
 
-	//public ICollection<Book>? Books { get; private set; }
+	public ICollection<Book>? Books { get; private set; }
 }

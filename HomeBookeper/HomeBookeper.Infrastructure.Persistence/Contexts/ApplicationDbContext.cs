@@ -26,11 +26,7 @@ public class ApplicationDbContext : DbContext
 
 	public DbSet<Product> Products { get; set; }
 
-	public DbSet<BoardBook> BoardBooks { get; set; }
-	public DbSet<ChildrensBook> ChildrensBooks { get; set; }
-	public DbSet<FictionBook> FictionBooks { get; set; }
-	public DbSet<NonFictionBook> NonFictionBooks { get; set; }
-
+	public DbSet<Book> Books { get; set; }
 	public DbSet<Author> Authors { get; set; }
 
 
@@ -64,6 +60,7 @@ public class ApplicationDbContext : DbContext
 			decimalProperty.SetColumnType("decimal(18,6)");
 		}
 
+		builder.ApplyConfiguration(new AuthorEntityConfiguration());
 		builder.ApplyConfiguration(new BookEntityConfiguration());
 
 		base.OnModelCreating(builder);

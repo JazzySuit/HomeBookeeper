@@ -15,18 +15,8 @@ public class GeneralProfile : Profile
 		CreateMap<CreateProductCommand, Product>();
 		CreateMap<GetAllProductsQuery, GetAllProductsParameter>();
 
-		CreateMap<BoardBook, GetAllBooksViewModel>();
-		CreateMap<CreateBookCommand, BoardBook>();
-
-		CreateMap<ChildrensBook, GetAllBooksViewModel>();
-		CreateMap<CreateBookCommand, ChildrensBook>();
-
-		CreateMap<FictionBook, GetAllBooksViewModel>();
-		CreateMap<CreateBookCommand, FictionBook>();
-
-		CreateMap<NonFictionBook, GetAllBooksViewModel>();
-		CreateMap<CreateBookCommand, NonFictionBook>();
-
+		CreateMap<Book, GetAllBooksViewModel>();
+		CreateMap<CreateBookCommand, Book>();
 		CreateMap<GetAllBooksQuery, GetAllBooksParameter>();
 	}
 }
