@@ -15,7 +15,7 @@ public class CreateBookCommand : IRequest<Response<int>>
 
 	public Isbn Isbn { get; set; }
 
-	public BookType BookType { get; set; }
+	public BookType Type { get; set; }
 
 	public string Publisher { get; set; }
 
@@ -36,6 +36,9 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Respo
 	public async Task<Response<int>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
 	{
 		var book = _mapper.Map<Book>(request);
+
+		book.AddAuthors(request.Authors);
+
 		await _bookRepository.AddAsync(book);
 		
 		return new Response<int>(book.Id);

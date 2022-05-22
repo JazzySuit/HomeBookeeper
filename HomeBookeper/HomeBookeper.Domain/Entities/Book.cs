@@ -1,4 +1,5 @@
 ﻿using HomeBookeper.Domain.Common;
+using HomeBookeper.Domain.Exceptions;
 using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Entities;
@@ -10,20 +11,23 @@ public class Book : BaseEntity
 		BookType type,
 		Isbn isbn,
 		string publisher,
-		//Author? author = null,
 		string? series = null)
 	{
 		if (string.IsNullOrEmpty(title))
 		{
-			throw new ArgumentException($"'{nameof(title)}' cannot be null or empty.", nameof(title));
+			throw new InvalidBookException($"'{nameof(title)}' cannot be null or empty.");
+		}
+
+		if (string.IsNullOrEmpty(publisher))
+		{
+			throw new InvalidBookException($"'{nameof(publisher)}' cannot be null or empty.");
 		}
 
 		Title = title;
 		Type = type;
-		Isbn = isbn ?? throw new ArgumentNullException(nameof(isbn));
+		Isbn = isbn ?? throw new InvalidIsbnException(nameof(isbn));
 		Publisher = publisher;
 
-		//AddAuthor(author);
 		Series = series;
 	}
 
@@ -44,9 +48,16 @@ public class Book : BaseEntity
 
 	public void AddAuthor(Author author)
 	{
-		if(author is not null)
+		if (author is not null)
+		{
 			_authors.Add(author);
+		}
 	}
 
 	private readonly List<Author> _authors = new List<Author>();
+
+	public void AddAuthors(ICollection<Author> authors)
+	{
+		throw new NotImplementedException();
+	}
 }
