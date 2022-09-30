@@ -8,14 +8,20 @@ public class Book : BaseEntity
 {
 	public Book(
 		string title,
+		Author author,
 		BookType type,
 		Isbn isbn,
-		string publisher,
+		string publisher, 
 		string? series = null)
 	{
 		if (string.IsNullOrEmpty(title))
 		{
 			throw new InvalidBookException($"'{nameof(title)}' cannot be null or empty.");
+		}
+
+		if (author == null)
+		{
+			throw new InvalidBookException($"'{nameof(author)}' cannot be null.");
 		}
 
 		if (string.IsNullOrEmpty(publisher))
@@ -45,7 +51,6 @@ public class Book : BaseEntity
 
 	public Isbn Isbn { get; init; }
 
-
 	public void AddAuthor(Author author)
 	{
 		if (author is not null)
@@ -54,10 +59,14 @@ public class Book : BaseEntity
 		}
 	}
 
-	private readonly List<Author> _authors = new List<Author>();
-
 	public void AddAuthors(ICollection<Author> authors)
 	{
-		throw new NotImplementedException();
+		foreach (var author in authors)
+		{
+			AddAuthor(author);
+		}
 	}
+
+	private readonly List<Author> _authors = new List<Author>();
+
 }

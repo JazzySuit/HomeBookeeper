@@ -1,4 +1,5 @@
-﻿using HomeBookeper.Domain.Values;
+﻿using HomeBookeper.Domain.Entities;
+using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.UnitTests.Fixture;
 
@@ -6,6 +7,7 @@ public class BookTestFixture : IDisposable
 {
 	public BookTestFixture()
 	{
+		ValidAuthor = new Author("Jane", "Doe");
 		ValidBookTitle = "The book of tests";
 		ValidBookPublisher = "Book Publisher";
 	}
@@ -15,9 +17,11 @@ public class BookTestFixture : IDisposable
 		
 	}
 
+	public Author ValidAuthor { get; init; }
+
 	public string ValidBookTitle { get; init; }
 
-	public string ValidBookPublisher { get; set; }
+	public string ValidBookPublisher { get; init; }
 
 	public Isbn GenerateValidIsbn(IsbnStandard isbnStandard = IsbnStandard.Isbn13)
 		=> isbnStandard switch

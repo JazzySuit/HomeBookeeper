@@ -30,7 +30,11 @@ public class BookController : BaseApiController
 	[Authorize]
 	public async Task<IActionResult> Post(CreateBookCommand command)
 	{
-		return Ok(await Mediator.Send(command));
+		var commandResponse = await Mediator.Send(command);
+
+		return commandResponse.Succeeded 
+			? Ok(commandResponse)
+			: BadRequest(commandResponse.Errors);
 	}
 
 	[HttpPut("{id}")]

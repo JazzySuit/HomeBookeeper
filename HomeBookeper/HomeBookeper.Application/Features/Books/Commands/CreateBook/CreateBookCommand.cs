@@ -9,9 +9,9 @@ namespace HomeBookeper.Application.Features.Books.Commands.CreateBook;
 
 public class CreateBookCommand : IRequest<Response<int>>
 {
-	public string Title { get; set; }
+	public string Title { get; set; } = string.Empty;
 
-	public ICollection<Author> Authors { get; set; }
+	public ICollection<Author> Authors { get; set; } = new List<Author>();
 
 	public Isbn Isbn { get; set; }
 

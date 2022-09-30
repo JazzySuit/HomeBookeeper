@@ -29,6 +29,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 
 		var kidsBookNoAuthor = new Book(
 			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
 			isbn13,
 			_bookFixture.ValidBookPublisher);
@@ -46,6 +47,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 
 		var boardBookNoAuthor = new Book(
 			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor,
 			BookType.BoardBook,
 			isbn13,
 			_bookFixture.ValidBookPublisher);
@@ -61,6 +63,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	{
 		var fictionBookNoAuthor = new Book(
 			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor,
 			BookType.FictionBook,
 			_bookFixture.GenerateValidIsbn(),
 			_bookFixture.ValidBookPublisher);
@@ -75,6 +78,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	{
 		var nonFictionBook = new Book(
 			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor, 
 			BookType.NonFictionBook,
 			_bookFixture.GenerateValidIsbn(),
 			_bookFixture.ValidBookPublisher);
@@ -88,19 +92,33 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	public void Throw_an_exception_when_creating_a_book_with_no_title()
 	{
 		Assert.Throws<InvalidBookException>(() => new Book(
-			string.Empty,
+			title: string.Empty,
+			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
 			_bookFixture.GenerateValidIsbn(),
 			_bookFixture.ValidBookPublisher));
 	}
+
+	[Fact]
+	public void Throw_an_exception_when_creating_a_book_with_no_author()
+	{
+		Assert.Throws<InvalidBookException>(() => new Book(
+			_bookFixture.ValidBookTitle,
+			author: null,
+			BookType.ChildrensBook,
+			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.ValidBookPublisher));
+	}
+
 	[Fact]
 	public void Throw_an_exception_when_creating_a_book_with_no_publisher()
 	{
 		Assert.Throws<InvalidBookException>(() => new Book(
 			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
 			_bookFixture.GenerateValidIsbn(),
-			string.Empty));
+			publisher: string.Empty));
 	}
 
 	[Fact]
@@ -108,14 +126,20 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	{
 		Assert.Throws<InvalidIsbnException>(() => new Book(
 			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
 			isbn: null,
 			_bookFixture.ValidBookPublisher));
 	}
 
-	#region private helper test methods
-
-
-
-	#endregion
+	[Fact]
+	public void Add_an_author_to_a_book()
+	{
+		var newBook = new Book(
+			_bookFixture.ValidBookTitle,
+			_bookFixture.ValidAuthor,
+			BookType.FictionBook,
+			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.ValidBookPublisher);
+	}
 }
