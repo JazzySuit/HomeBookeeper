@@ -1,10 +1,11 @@
 ﻿using HomeBookeper.Domain.Common;
 using HomeBookeper.Domain.Exceptions;
+using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Entities;
 
-public class Book : BaseEntity
+public class Book : BaseEntity, IBook
 {
 	public Book(
 		string title,

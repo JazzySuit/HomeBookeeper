@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using HomeBookeper.Domain.Entities;
+using HomeBookeper.Domain.Interfaces;
 using Xunit;
 
 namespace HomeBookeper.Domain.UnitTests;
@@ -12,9 +13,27 @@ public class LibraryTests
 
 
 	[Fact]
-	public void Adding_a_new_book_to_the_library_creates_a_new_book_object()
+	public void Can_add_a_new_valid_book_to_the_library()
 	{
+		var isbn10 = new Values.Isbn(Values.IsbnStandard.Isbn10, 1234567890);
 
+		IBook book = new Book(
+			"Book Title",
+			new Author("Bobb", "Bearly"),
+			BookType.FictionBook,
+			isbn10,
+			"Book Publisher");
+
+		ILibrary library = new Library();
+
+		var addBookToLibrary = () => library.AddBook(book);
+
+		addBookToLibrary.Should().NotThrow();
+
+		var addedBook = library.FindBook(isbn10);
+
+		addedBook.Should().NotBeNull();
+		addedBook.Should().Be(book);
 	}
 
 	[Fact]
