@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeBookeper.Infrastructure.Persistence.Configurations;
 
-public class BookEntityConfiguration : IEntityTypeConfiguration<Book>
+public class BookEntityConfiguration : IEntityTypeConfiguration<LibraryBook>
 {
-	public void Configure(EntityTypeBuilder<Book> builder)
+	public void Configure(EntityTypeBuilder<LibraryBook> builder)
 	{
 		builder.HasKey(book => book.Id);
 
@@ -45,6 +45,6 @@ public class BookEntityConfiguration : IEntityTypeConfiguration<Book>
 
 	private static Isbn CreateIsbnFromDbValue(long value)
 		=> value.ToString().Length == 13
-				? new Isbn(IsbnStandard.Isbn13, value)
-				: new Isbn(IsbnStandard.Isbn10, value);
+				? new Isbn13(value)
+				: new Isbn10(value);
 }

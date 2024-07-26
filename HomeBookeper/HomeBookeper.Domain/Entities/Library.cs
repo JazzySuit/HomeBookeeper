@@ -1,22 +1,37 @@
 ﻿using HomeBookeper.Domain.Enums;
+using HomeBookeper.Domain.Exceptions;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.Values;
+using System.Linq;
 
 namespace HomeBookeper.Domain.Entities;
 
 public class Library : ILibrary
 {
-	public void AddNewBook(IBook book, ILibraryUser addedByUser)
+	public void AddNewBook(ILibraryBook book, ILibraryUser addedByUser)
 	{
 		if (_libraryBooks.Contains(book))
 			return;
 
 		_libraryBooks.Add(book);
 
-		if (_wishlistedBooks.Contains(book))
-			_wishlistedBooks.Remove(book);
+		RemoveBookFromWishlist(book, addedByUser);
 
-		_transactions.Add(new LibraryBookAdded(book.Isbn, addedByUser));
+		_libraryBookTransactions.Add(new LibraryBookAdded(book, addedByUser));
+	}
+
+	private void RemoveBookFromWishlist(ILibraryBook book, ILibraryUser user)
+	{
+		// TODO: handle same name books, but different books
+		var wishlistedBook = _wishlistedBooks
+			.Where(b => b.Title.Equals(book.Title, StringComparison.OrdinalIgnoreCase))
+			.FirstOrDefault();
+
+		if (wishlistedBook is not null)
+		{
+			_wishlistedBooks.Remove(wishlistedBook);
+			_libraryBookTransactions.Add(new WishlistedBookRemoved(wishlistedBook, user));
+		}
 	}
 
 	public BookStateRecord GetBookRecord(IBook book)
@@ -25,77 +40,61 @@ public class Library : ILibrary
 
 		return bookState switch
 		{
-			BookState.OnLoan => OnLoanBookRecord(book)
+			_ => throw new NotImplementedException()
 		};
-	}
-
-	private BookStateRecord OnLoanBookRecord(IBook book)
-	{
-		var record = new BookStateRecord(book, BookState.OnLoan);
-
-		// watchout: Can only do this filtering here because it has
-		// already been done again but for checking book state
-		var loanTransaction = _transactions
-			.Where(t => t.Value == book.Isbn)
-			.Where(t => t.Type == TransactionType.LoanedOut)
-			.OrderByDescending(t => t.ActionedOn)
-			.First();
-
-		// WARNING - ASSUMPTION: only one user in library with name, no duplicates
-		var loanUser = _libraryBooksOnLoan
-			.Where(loans => loans.Value.Contains(book))
-			.Where(loans => loans.Key.Name == loanTransaction.ActionedBy)
-			.Select(loans => loans.Key)
-			.Single();
-
-		record.Metadata.Add("onloanto", (loanUser.Id.ToString(), nameof(Guid)));
-		record.Metadata.Add("returnduedate", ("", ""));
-
-		return record;
 	}
 
 	public BookState GetBookState(IBook book)
 	{
-		var transaction = _transactions
-			.Where(t => t.Value == book.Isbn)
-			.OrderByDescending(t => t.ActionedOn)
-			.FirstOrDefault();
+		throw new NotImplementedException();
+	}
 
-		return transaction?.Type switch
+	public IBook FindBook(SearchableBookProperties searchProp)
+	{
+		throw new NotImplementedException();
+	}
+
+	public ILibraryBook? FindBook(Isbn isbnNumber)
+		=> _libraryBooks.Where(book => book.Isbn == isbnNumber).SingleOrDefault();
+
+	// TODO: might want to change return type...
+	public void LoanBook(ILibraryBook book, ILibraryUser user)
+	{
+		// if the book is able to be loaned out
+		//   then loan the book
+		// else 
+		//   do nothing ...??
+
+		if (IsAbleToBeBorrowed(book))
 		{
-			TransactionType.Wishlisted => BookState.OnWishlist,
-			TransactionType.Added => BookState.InPossession,
-			TransactionType.LoanedOut => BookState.OnLoan,
-			_ => BookState.NotInLibrary
-		};
+			_libraryBooksOnLoan.Add(user, new List<ILibraryBook> { book });
+			_libraryBookTransactions.Add(new LibraryBookLoanedOut(book, user));
+		}
 	}
 
-	public IBook? FindBook(Isbn isbnNumber)
+	private bool IsAbleToBeBorrowed(ILibraryBook book)
 	{
-		var book = _libraryBooks.Where(book => book.Isbn == isbnNumber).SingleOrDefault();
-
-		return book ?? _wishlistedBooks.Where(book => book.Isbn == isbnNumber).SingleOrDefault();
+		return !_libraryBooksOnLoan.Any(loans => loans.Value.Contains(book));
 	}
 
-	public void LoanBook(IBook book, ILibraryUser user)
+	public void WishlistBook(WishlistedBook book, ILibraryUser wishlistedByUser)
 	{
-		_libraryBooksOnLoan.Add(user, new List<IBook> { book });
-
-		_transactions.Add(new LibraryBookLoanedOut(book.Isbn, user));
-	}
-
-	public void WishlistBook(IBook book, ILibraryUser wishlistedByUser)
-	{
-		if (_wishlistedBooks.Contains(book) || _libraryBooks.Contains(book))
+		if (_wishlistedBooks.Contains(book) || _libraryBooks.Any(b => b.Title.Equals(book.Title, StringComparison.OrdinalIgnoreCase)))
 			return;
 
 		_wishlistedBooks.Add(book);
-		_transactions.Add(new LibraryBookWishlisted(book.Isbn, wishlistedByUser));
+		_booksWishedToBeAddedToLibrary.Add(new BookWishlisted(book, wishlistedByUser));
 	}
 
-	private readonly List<IBook> _libraryBooks = new();
-	private readonly List<IBook> _wishlistedBooks = new();
-	private readonly List<ILibraryTransaction> _transactions = new();
+	public BookStateRecord GetBookRecord(ILibraryBook book)
+	{
+		throw new NotImplementedException();
+	}
 
-	private readonly Dictionary<ILibraryUser, List<IBook>> _libraryBooksOnLoan = new();
+	private readonly List<ILibraryBook> _libraryBooks = new();
+	private readonly List<WishlistedBook> _wishlistedBooks = new();
+	private readonly List<ILibraryTransaction> _libraryBookTransactions = new();
+	private readonly List<BookWishlisted> _booksWishedToBeAddedToLibrary = new ();
+
+	private readonly Dictionary<ILibraryUser, List<ILibraryBook>> _libraryBooksOnLoan = new();
 }

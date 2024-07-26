@@ -26,7 +26,7 @@ public class ApplicationDbContext : DbContext
 
 	public DbSet<Product> Products { get; set; }
 
-	public DbSet<Book> Books { get; set; }
+	public DbSet<LibraryBook> Books { get; set; }
 	public DbSet<Author> Authors { get; set; }
 
 

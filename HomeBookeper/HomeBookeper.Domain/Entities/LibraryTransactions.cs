@@ -1,59 +1,63 @@
 ﻿using HomeBookeper.Domain.Enums;
 using HomeBookeper.Domain.Interfaces;
-using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Entities;
 
-public abstract class LibraryBookTransaction : ILibraryTransaction
+public abstract class LibraryBookTransaction<T> : ILibraryTransaction
 {
-	public LibraryBookTransaction(Isbn isbn, ILibraryUser actioningUser)
+	public LibraryBookTransaction(T transactionValue, ILibraryUser actioningUser)
 	{
 		Id = Guid.NewGuid();
 		ActionedOn = DateTime.Now;
 		ActionedBy = actioningUser.Name;
-		Value = isbn;
+		Value = transactionValue;
 	}
 
 	public Guid Id { get; init; }
 
-	public virtual TransactionType Type { get; init; }
+	public TransactionType Type { get; protected set; }
 
-	public DateTime ActionedOn { get; init; }
+	public DateTime ActionedOn { get; private set; }
 
-	public string ActionedBy { get; init; }
+	public string ActionedBy { get; private set; }
 
-	public Isbn Value { get; init; }
+	public T Value { get; private set; }
 }
 
-public class LibraryBookAdded : LibraryBookTransaction, ILibraryTransaction
+
+
+public class LibraryBookAdded : LibraryBookTransaction<ILibraryBook>, ILibraryTransaction
 {
-	public LibraryBookAdded(Isbn isbn, ILibraryUser actioningUser)
-		: base(isbn, actioningUser)
+	public LibraryBookAdded(ILibraryBook book, ILibraryUser actioningUser)
+		: base(book, actioningUser)
 	{
 		Type = TransactionType.Added;
 	}
-
-	public override TransactionType Type { get; init; }
 }
 
-public class LibraryBookLoanedOut : LibraryBookTransaction, ILibraryTransaction
+public class LibraryBookLoanedOut : LibraryBookTransaction<ILibraryBook>, ILibraryTransaction
 {
-	public LibraryBookLoanedOut(Isbn isbn, ILibraryUser actioningUser)
-		: base(isbn, actioningUser)
+	public LibraryBookLoanedOut(ILibraryBook book, ILibraryUser actioningUser)
+		: base(book, actioningUser)
 	{
 		Type = TransactionType.LoanedOut;
 	}
-
-	public override TransactionType Type { get; init; }
 }
 
-public class LibraryBookWishlisted : LibraryBookTransaction, ILibraryTransaction
+public class BookWishlisted : LibraryBookTransaction<IBook>, ILibraryTransaction
 {
-	public LibraryBookWishlisted(Isbn isbn, ILibraryUser actioningUser)
-		: base(isbn, actioningUser)
+	public BookWishlisted(IBook book, ILibraryUser actioningUser)
+		: base(book, actioningUser)
 	{
 		Type = TransactionType.Wishlisted;
 	}
+}
 
-	public override TransactionType Type { get; init; }
+public class WishlistedBookRemoved : LibraryBookTransaction<IBook>, ILibraryTransaction
+{
+	public WishlistedBookRemoved(IBook book, ILibraryUser actioningUser)
+		: base(book, actioningUser)
+	{
+		Type = TransactionType.WishlistRemoved;
+	}
 }

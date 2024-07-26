@@ -35,7 +35,7 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Respo
 
 	public async Task<Response<int>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
 	{
-		var book = _mapper.Map<Book>(request);
+		var book = _mapper.Map<LibraryBook>(request);
 
 		book.AddAuthors(request.Authors);
 

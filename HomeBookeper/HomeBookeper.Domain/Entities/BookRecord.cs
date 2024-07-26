@@ -5,14 +5,14 @@ namespace HomeBookeper.Domain.Entities;
 
 public record BookStateRecord //: IBookState
 {
-	public BookStateRecord(IBook book, BookState state)
+	public BookStateRecord(ILibraryBook book, BookState state)
 	{
 		Metadata = new Dictionary<string, (string, string)>();
 		Book = book;
 		State = state;
 	}
 
-	public IBook Book { get; init; }
+	public ILibraryBook Book { get; init; }
 
 	public BookState State { get; init; }
 
@@ -21,3 +21,7 @@ public record BookStateRecord //: IBookState
 	/// </summary>
 	public IDictionary<string, (string, string)> Metadata { get; init; }
 }
+
+// BookTransactionLog: added -> (loaned <-> returned) -> removed
+
+// BookState: last transacton in log

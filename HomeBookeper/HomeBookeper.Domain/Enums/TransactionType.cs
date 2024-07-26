@@ -3,6 +3,7 @@
 public enum TransactionType
 {
 	Wishlisted,
+	WishlistRemoved,
 	Added,
 	LoanedOut
 }

@@ -2,35 +2,30 @@
 
 namespace HomeBookeper.Domain.Values;
 
-public record Isbn
+
+public abstract record Isbn : SearchableBookProperties
 {
-	public Isbn(
-		IsbnStandard standard,
-		long value)
-	{
-		if (standard == IsbnStandard.Isbn10 
-			&& value.ToString().Length != 10)
-		{
-			throw new InvalidIsbnException($"The ISBN-10 {nameof(value)}, {value}, is not of length 10");
-		}
-
-		if (standard == IsbnStandard.Isbn13
-			&& value.ToString().Length != 13)
-		{
-			throw new InvalidIsbnException($"The ISBN-13 {nameof(value)}, {value}, is not of length 13");
-		}
-
-		Standard = standard;
-		Value = value;
-	}
-
-	public IsbnStandard Standard { get; init; }
-
 	public long Value { get; init; }
 }
 
-public enum IsbnStandard
+public record Isbn10 : Isbn
 {
-	Isbn10,
-	Isbn13
+	public Isbn10(long value)
+	{
+		if (value.ToString().Length != 10)
+			throw new InvalidIsbnException($"The ISBN-10 {nameof(value)}, {value}, is not of length 10");
+
+		Value = value;
+	}
+}
+
+public record Isbn13 : Isbn
+{
+	public Isbn13(long value)
+	{
+		if (value.ToString().Length != 13)
+			throw new InvalidIsbnException($"The ISBN-13 {nameof(value)}, {value}, is not of length 13");
+
+		Value = value;
+	}
 }

@@ -6,11 +6,11 @@ using MediatR;
 
 namespace HomeBookeper.Application.Features.Books.Queries.GetBooksById;
 
-public class GetBookByIdQuery : IRequest<Response<Book>>
+public class GetBookByIdQuery : IRequest<Response<LibraryBook>>
 {
 	public int Id { get; set; }
 
-	public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, Response<Book>>
+	public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, Response<LibraryBook>>
 	{
 		private readonly IBookRepositoryAsync _bookRepository;
 
@@ -19,7 +19,7 @@ public class GetBookByIdQuery : IRequest<Response<Book>>
 			_bookRepository = bookRepository;
 		}
 
-		public async Task<Response<Book>> Handle(
+		public async Task<Response<LibraryBook>> Handle(
 			GetBookByIdQuery request, 
 			CancellationToken cancellationToken)
 		{
@@ -27,7 +27,7 @@ public class GetBookByIdQuery : IRequest<Response<Book>>
 			if (book == null)
 				throw new ApiException("Book not found");
 
-			return new Response<Book>(book);
+			return new Response<LibraryBook>(book);
 		}
 	}
 }

@@ -6,15 +6,15 @@ namespace HomeBookeper.Domain.Interfaces;
 
 public interface ILibrary
 {
-	void AddNewBook(IBook book, ILibraryUser addedByUser);
+	void AddNewBook(ILibraryBook book, ILibraryUser addedByUser);
 
-	BookStateRecord GetBookRecord(IBook book);
+	BookStateRecord GetBookRecord(ILibraryBook book);
 
 	BookState GetBookState(IBook book);
 
-	IBook? FindBook(Isbn isbnNumber);
+	public IBook FindBook(SearchableBookProperties searchProp);
 
-	void LoanBook(IBook book, ILibraryUser user);
+	void LoanBook(ILibraryBook book, ILibraryUser user);
 
-	void WishlistBook(IBook book, ILibraryUser wishlistedByUser);
+	void WishlistBook(WishlistedBook book, ILibraryUser wishlistedByUser);
 }

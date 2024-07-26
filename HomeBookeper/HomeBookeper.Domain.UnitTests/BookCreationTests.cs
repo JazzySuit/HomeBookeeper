@@ -17,17 +17,23 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	}
 
 	[Fact]
-	public void Attempting_to_create_an_invalid_isbn_throws_an_exception()
+	public void Attempting_to_create_an_invalid_isbn_10_throws_an_exception()
 	{
-		Assert.Throws<InvalidIsbnException>(() => new Isbn(IsbnStandard.Isbn10, 123456));
+		Assert.Throws<InvalidIsbnException>(() => new Isbn10(123456));
+	}
+
+	[Fact]
+	public void Attempting_to_create_an_invalid_isbn_13_throws_an_exception()
+	{
+		Assert.Throws<InvalidIsbnException>(() => new Isbn13(678901234));
 	}
 
 	[Fact]
 	public void Can_create_a_childrens_book()
 	{
-		var isbn13 = _bookFixture.GenerateValidIsbn();
+		var isbn13 = _bookFixture.GenerateValidIsbn13();
 
-		var kidsBookNoAuthor = new Book(
+		var kidsBookNoAuthor = new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
@@ -43,9 +49,9 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	[Fact]
 	public void Can_create_a_board_book()
 	{
-		var isbn13 = _bookFixture.GenerateValidIsbn();
+		var isbn13 = _bookFixture.GenerateValidIsbn10();
 
-		var boardBookNoAuthor = new Book(
+		var boardBookNoAuthor = new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor,
 			BookType.BoardBook,
@@ -61,11 +67,11 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	[Fact]
 	public void Can_create_a_fiction_book()
 	{
-		var fictionBookNoAuthor = new Book(
+		var fictionBookNoAuthor = new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor,
 			BookType.FictionBook,
-			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.GenerateValidIsbn10(),
 			_bookFixture.ValidBookPublisher);
 
 		fictionBookNoAuthor.Title.Should().Be(_bookFixture.ValidBookTitle);
@@ -76,11 +82,11 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	[Fact]
 	public void Can_create_a_nonfiction_book()
 	{
-		var nonFictionBook = new Book(
+		var nonFictionBook = new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor, 
 			BookType.NonFictionBook,
-			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.GenerateValidIsbn13(),
 			_bookFixture.ValidBookPublisher);
 
 		nonFictionBook.Title.Should().Be(_bookFixture.ValidBookTitle);
@@ -91,40 +97,40 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	[Fact]
 	public void Throw_an_exception_when_creating_a_book_with_no_title()
 	{
-		Assert.Throws<InvalidBookException>(() => new Book(
+		Assert.Throws<InvalidBookException>(() => new LibraryBook(
 			title: string.Empty,
 			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
-			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.GenerateValidIsbn13(),
 			_bookFixture.ValidBookPublisher));
 	}
 
 	[Fact]
 	public void Throw_an_exception_when_creating_a_book_with_no_author()
 	{
-		Assert.Throws<InvalidBookException>(() => new Book(
+		Assert.Throws<InvalidBookException>(() => new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			author: null,
 			BookType.ChildrensBook,
-			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.GenerateValidIsbn10(),
 			_bookFixture.ValidBookPublisher));
 	}
 
 	[Fact]
 	public void Throw_an_exception_when_creating_a_book_with_no_publisher()
 	{
-		Assert.Throws<InvalidBookException>(() => new Book(
+		Assert.Throws<InvalidBookException>(() => new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
-			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.GenerateValidIsbn10(),
 			publisher: string.Empty));
 	}
 
 	[Fact]
 	public void Throw_an_exception_when_creating_a_book_with_no_isbn()
 	{
-		Assert.Throws<InvalidIsbnException>(() => new Book(
+		Assert.Throws<InvalidIsbnException>(() => new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor, 
 			BookType.ChildrensBook,
@@ -135,11 +141,11 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 	[Fact]
 	public void Add_an_author_to_a_book()
 	{
-		var newBook = new Book(
+		var newBook = new LibraryBook(
 			_bookFixture.ValidBookTitle,
 			_bookFixture.ValidAuthor,
 			BookType.FictionBook,
-			_bookFixture.GenerateValidIsbn(),
+			_bookFixture.GenerateValidIsbn13(),
 			_bookFixture.ValidBookPublisher);
 	}
 }

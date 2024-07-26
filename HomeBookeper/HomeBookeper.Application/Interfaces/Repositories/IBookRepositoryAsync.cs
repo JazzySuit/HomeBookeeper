@@ -2,7 +2,7 @@
 
 namespace HomeBookeper.Application.Interfaces.Repositories;
 
-public interface IBookRepositoryAsync : IGenericRepositoryAsync<Book>
+public interface IBookRepositoryAsync : IGenericRepositoryAsync<LibraryBook>
 {
 	Task<bool> IsUniqueIsbnAsync(int isbn);
 }

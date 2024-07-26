@@ -5,9 +5,9 @@ using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Entities;
 
-public class Book : BaseEntity, IBook
+public class LibraryBook : BaseEntity, ILibraryBook
 {
-	public Book(
+	public LibraryBook(
 		string title,
 		Author author,
 		BookType type,
@@ -51,6 +51,10 @@ public class Book : BaseEntity, IBook
 	public string? Series { get; init; }
 
 	public Isbn Isbn { get; init; }
+
+	public int PublishedYear => throw new NotImplementedException();
+
+	public IReadOnlyCollection<ILibraryTransaction> TransactionLog => throw new NotImplementedException();
 
 	public void AddAuthor(Author author)
 	{

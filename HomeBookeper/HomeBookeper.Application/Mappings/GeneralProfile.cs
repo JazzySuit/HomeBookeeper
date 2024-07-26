@@ -15,8 +15,8 @@ public class GeneralProfile : Profile
 		CreateMap<CreateProductCommand, Product>();
 		CreateMap<GetAllProductsQuery, GetAllProductsParameter>();
 
-		CreateMap<Book, GetAllBooksViewModel>();
-		CreateMap<CreateBookCommand, Book>()
+		CreateMap<LibraryBook, GetAllBooksViewModel>();
+		CreateMap<CreateBookCommand, LibraryBook>()
 			.ForMember(dest => dest.Authors, src => src.Ignore());
 		CreateMap<GetAllBooksQuery, GetAllBooksParameter>();
 	}

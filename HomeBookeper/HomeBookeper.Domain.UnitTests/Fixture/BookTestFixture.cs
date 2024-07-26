@@ -23,11 +23,7 @@ public class BookTestFixture : IDisposable
 
 	public string ValidBookPublisher { get; init; }
 
-	public Isbn GenerateValidIsbn(IsbnStandard isbnStandard = IsbnStandard.Isbn13)
-		=> isbnStandard switch
-		{
-			IsbnStandard.Isbn10 => new Isbn(IsbnStandard.Isbn10, 1234567890),
-			IsbnStandard.Isbn13 => new Isbn(IsbnStandard.Isbn13, 1234567899123),
-			_ => throw new NotImplementedException("Isbn standard not implemented")
-		};
+	public Isbn GenerateValidIsbn10() => new Isbn10(1234567890);
+
+	public Isbn GenerateValidIsbn13() => new Isbn13(1234567899123);
 }
