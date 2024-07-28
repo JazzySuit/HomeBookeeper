@@ -1,4 +1,5 @@
-﻿using HomeBookeper.Domain.Entities;
+﻿using HomeBookeper.Domain.Common;
+using HomeBookeper.Domain.Entities;
 using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Interfaces;
@@ -13,7 +14,11 @@ public interface ILibraryBook : IBook
 
 	BookType Type { get; }
 
-	IReadOnlyCollection<ILibraryTransaction> TransactionLog { get; }
+	IReadOnlyCollection<BookTransaction> TransactionLog { get; } // does this need to be??
+
+	bool CanBeIssued { get; }
+
+	void IssuedTo(ILibraryUser user);
 }
 
 public interface IBook 

@@ -22,11 +22,8 @@ public class ApplicationDbContext : DbContext
 		_authenticatedUser = authenticatedUser;
 	}
 
-
-
-	public DbSet<Product> Products { get; set; }
-
 	public DbSet<LibraryBook> Books { get; set; }
+
 	public DbSet<Author> Authors { get; set; }
 
 

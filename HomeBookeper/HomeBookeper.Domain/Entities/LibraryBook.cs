@@ -1,4 +1,5 @@
 ﻿using HomeBookeper.Domain.Common;
+using HomeBookeper.Domain.Enums;
 using HomeBookeper.Domain.Exceptions;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.Values;
@@ -31,6 +32,7 @@ public class LibraryBook : BaseEntity, ILibraryBook
 		}
 
 		Title = title;
+		_authors.Add( author );
 		Type = type;
 		Isbn = isbn ?? throw new InvalidIsbnException(nameof(isbn));
 		Publisher = publisher;
@@ -54,7 +56,12 @@ public class LibraryBook : BaseEntity, ILibraryBook
 
 	public int PublishedYear => throw new NotImplementedException();
 
-	public IReadOnlyCollection<ILibraryTransaction> TransactionLog => throw new NotImplementedException();
+	public IReadOnlyCollection<BookTransaction> TransactionLog => _transactionLog.AsReadOnly();
+
+	public bool CanBeIssued 
+		=> _transactionLog.Any() 
+				? _transactionLog.Last().Action == BookTransactionType.BookReturned
+				: true;
 
 	public void AddAuthor(Author author)
 	{
@@ -72,6 +79,12 @@ public class LibraryBook : BaseEntity, ILibraryBook
 		}
 	}
 
-	private readonly List<Author> _authors = new List<Author>();
+	public void IssuedTo(ILibraryUser user)
+	{
+		_transactionLog.Add(BookTransaction.BookIssuedToUser(this, user));
+	}
+
+	private readonly List<Author> _authors = new ();
+	private readonly List<BookTransaction> _transactionLog = new();
 
 }

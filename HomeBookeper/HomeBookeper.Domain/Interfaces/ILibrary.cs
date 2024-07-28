@@ -8,13 +8,13 @@ public interface ILibrary
 {
 	void AddNewBook(ILibraryBook book, ILibraryUser addedByUser);
 
-	BookStateRecord GetBookRecord(ILibraryBook book);
+	LibraryBookState GetBookState(ILibraryBook book);
 
-	BookState GetBookState(IBook book);
-
-	public IBook FindBook(SearchableBookProperties searchProp);
+	IEnumerable<ILibraryBook> FindBook(SearchableBookProperties searchProp);
 
 	void LoanBook(ILibraryBook book, ILibraryUser user);
 
-	void WishlistBook(WishlistedBook book, ILibraryUser wishlistedByUser);
+	void ReturnBook(ILibraryBook book);
+
+	(BookStatus BookStatus, string ToUser) GetLibraryBookState(ILibraryBook book);
 }

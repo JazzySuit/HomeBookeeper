@@ -28,7 +28,7 @@ public static class ServiceRegistration
 
 		#region Repositories
 		services.AddTransient(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
-		services.AddTransient<IProductRepositoryAsync, ProductRepositoryAsync>();
+		//services.AddTransient<IProductRepositoryAsync, ProductRepositoryAsync>();
 
 		services.AddTransient<IBookRepositoryAsync, BookRepositoryAsync>();
 

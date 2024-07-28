@@ -1,8 +1,8 @@
-﻿using HomeBookeper.Application.Filters;
+﻿//using HomeBookeper.Application.Filters;
 
-namespace HomeBookeper.Application.Features.Products.Queries.GetAllProducts;
+//namespace HomeBookeper.Application.Features.Products.Queries.GetAllProducts;
 
-public class GetAllProductsParameter : RequestParameter
-{
+//public class GetAllProductsParameter : RequestParameter
+//{
 
-}
+//}

@@ -42,14 +42,14 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 
 		kidsBookNoAuthor.Title.Should().Be(_bookFixture.ValidBookTitle);
 		kidsBookNoAuthor.Publisher.Should().Be(_bookFixture.ValidBookPublisher);
-		kidsBookNoAuthor.Authors.Count.Should().Be(0);
+		kidsBookNoAuthor.Authors.Count.Should().Be(1);
 		kidsBookNoAuthor.Isbn.Should().Be(isbn13);
 	}
 
 	[Fact]
 	public void Can_create_a_board_book()
 	{
-		var isbn13 = _bookFixture.GenerateValidIsbn10();
+		var isbn13 = _bookFixture.GenerateValidIsbn13();
 
 		var boardBookNoAuthor = new LibraryBook(
 			_bookFixture.ValidBookTitle,
@@ -60,7 +60,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 
 		boardBookNoAuthor.Title.Should().Be(_bookFixture.ValidBookTitle);
 		boardBookNoAuthor.Publisher.Should().Be(_bookFixture.ValidBookPublisher);
-		boardBookNoAuthor.Authors.Count.Should().Be(0);
+		boardBookNoAuthor.Authors.Count.Should().Be(1);
 		boardBookNoAuthor.Isbn.Should().Be(isbn13);
 	}
 
@@ -76,7 +76,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 
 		fictionBookNoAuthor.Title.Should().Be(_bookFixture.ValidBookTitle);
 		fictionBookNoAuthor.Publisher.Should().Be(_bookFixture.ValidBookPublisher);
-		fictionBookNoAuthor.Authors.Count.Should().Be(0);
+		fictionBookNoAuthor.Authors.Count.Should().Be(1);
 	}
 
 	[Fact]
@@ -91,7 +91,7 @@ public class BookCreationTests : IClassFixture<BookTestFixture>
 
 		nonFictionBook.Title.Should().Be(_bookFixture.ValidBookTitle);
 		nonFictionBook.Publisher.Should().Be(_bookFixture.ValidBookPublisher);
-		nonFictionBook.Authors.Count.Should().Be(0);
+		nonFictionBook.Authors.Count.Should().Be(1);
 	}
 
 	[Fact]

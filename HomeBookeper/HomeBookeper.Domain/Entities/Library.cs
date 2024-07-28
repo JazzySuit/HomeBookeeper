@@ -1,8 +1,6 @@
 ﻿using HomeBookeper.Domain.Enums;
-using HomeBookeper.Domain.Exceptions;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.Values;
-using System.Linq;
 
 namespace HomeBookeper.Domain.Entities;
 
@@ -14,48 +12,47 @@ public class Library : ILibrary
 			return;
 
 		_libraryBooks.Add(book);
-
-		RemoveBookFromWishlist(book, addedByUser);
-
-		_libraryBookTransactions.Add(new LibraryBookAdded(book, addedByUser));
+		_libraryBookTransactions.Add(LibraryTransaction.BookAddedToLibrary(book, addedByUser));
 	}
 
-	private void RemoveBookFromWishlist(ILibraryBook book, ILibraryUser user)
+	public LibraryBookState GetBookState(ILibraryBook book)
 	{
-		// TODO: handle same name books, but different books
-		var wishlistedBook = _wishlistedBooks
-			.Where(b => b.Title.Equals(book.Title, StringComparison.OrdinalIgnoreCase))
-			.FirstOrDefault();
+		if (_libraryBooks.Contains(book))
+			return LibraryBookState.IsAnAvailableBook;
 
-		if (wishlistedBook is not null)
-		{
-			_wishlistedBooks.Remove(wishlistedBook);
-			_libraryBookTransactions.Add(new WishlistedBookRemoved(wishlistedBook, user));
-		}
+		return LibraryBookState.NotInLibrary;
 	}
 
-	public BookStateRecord GetBookRecord(IBook book)
+	public IEnumerable<ILibraryBook> FindBook(SearchableBookProperties searchProp)
 	{
-		var bookState = GetBookState(book);
-
-		return bookState switch
+		return searchProp switch
 		{
-			_ => throw new NotImplementedException()
+			Title title => FindBookByTitle(title),
+			Isbn isbn => FindBookByIsbn(isbn),
+			AuthorName author => FindBookByAuthor(author),
+			_ => new List<ILibraryBook>()
 		};
 	}
 
-	public BookState GetBookState(IBook book)
+	public (BookStatus BookStatus, string ToUser) GetLibraryBookState(ILibraryBook book)
 	{
-		throw new NotImplementedException();
+		var bookInLib = FindBookByIsbn(book.Isbn).SingleOrDefault();
+
+		return bookInLib is not null
+			? (BookStatus.IsAvailable, string.Empty)
+			: bookInLib?.CanBeIssued == true 
+				? (BookStatus.IsAvailable, string.Empty)
+				: (BookStatus.OnLoan, string.Empty) ;
 	}
 
-	public IBook FindBook(SearchableBookProperties searchProp)
-	{
-		throw new NotImplementedException();
-	}
+	private IEnumerable<ILibraryBook> FindBookByAuthor(AuthorName author)
+		=> _libraryBooks.Where(b => b.Authors.Where(a => a.FirstName == author.First && a.LastName == author.Last).Any());
 
-	public ILibraryBook? FindBook(Isbn isbnNumber)
-		=> _libraryBooks.Where(book => book.Isbn == isbnNumber).SingleOrDefault();
+	private IEnumerable<ILibraryBook> FindBookByTitle(Title title)
+		=> _libraryBooks.Where(b => b.Title == title.T);
+
+	private IEnumerable<ILibraryBook> FindBookByIsbn(Isbn isbnNumber)
+		=> _libraryBooks.Where(book => book.Isbn == isbnNumber);
 
 	// TODO: might want to change return type...
 	public void LoanBook(ILibraryBook book, ILibraryUser user)
@@ -68,7 +65,7 @@ public class Library : ILibrary
 		if (IsAbleToBeBorrowed(book))
 		{
 			_libraryBooksOnLoan.Add(user, new List<ILibraryBook> { book });
-			_libraryBookTransactions.Add(new LibraryBookLoanedOut(book, user));
+			book.IssuedTo(user);
 		}
 	}
 
@@ -77,24 +74,14 @@ public class Library : ILibrary
 		return !_libraryBooksOnLoan.Any(loans => loans.Value.Contains(book));
 	}
 
-	public void WishlistBook(WishlistedBook book, ILibraryUser wishlistedByUser)
-	{
-		if (_wishlistedBooks.Contains(book) || _libraryBooks.Any(b => b.Title.Equals(book.Title, StringComparison.OrdinalIgnoreCase)))
-			return;
-
-		_wishlistedBooks.Add(book);
-		_booksWishedToBeAddedToLibrary.Add(new BookWishlisted(book, wishlistedByUser));
-	}
-
-	public BookStateRecord GetBookRecord(ILibraryBook book)
+	public void ReturnBook(ILibraryBook book)
 	{
 		throw new NotImplementedException();
 	}
 
 	private readonly List<ILibraryBook> _libraryBooks = new();
 	private readonly List<WishlistedBook> _wishlistedBooks = new();
-	private readonly List<ILibraryTransaction> _libraryBookTransactions = new();
-	private readonly List<BookWishlisted> _booksWishedToBeAddedToLibrary = new ();
+	private readonly List<LibraryTransaction> _libraryBookTransactions = new();
 
 	private readonly Dictionary<ILibraryUser, List<ILibraryBook>> _libraryBooksOnLoan = new();
 }
