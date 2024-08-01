@@ -19,6 +19,11 @@ public class Library : ILibrary
 	{
 		if (_libraryBooks.Contains(book))
 			return LibraryBookState.IsAnAvailableBook;
+		else if (_libraryBookTransactions
+					.Where(t => t.Value.Isbn == book.Isbn)
+					.Where(t => t.Action == LibraryTransactionType.BookRemoved)
+					.LastOrDefault() is not null)
+			return LibraryBookState.RemovedFromLibrary;
 
 		return LibraryBookState.NotInLibrary;
 	}
@@ -34,17 +39,6 @@ public class Library : ILibrary
 		};
 	}
 
-	public (BookStatus BookStatus, string ToUser) GetLibraryBookState(ILibraryBook book)
-	{
-		var bookInLib = FindBookByIsbn(book.Isbn).SingleOrDefault();
-
-		return bookInLib is not null
-			? (BookStatus.IsAvailable, string.Empty)
-			: bookInLib?.CanBeIssued == true 
-				? (BookStatus.IsAvailable, string.Empty)
-				: (BookStatus.OnLoan, string.Empty) ;
-	}
-
 	private IEnumerable<ILibraryBook> FindBookByAuthor(AuthorName author)
 		=> _libraryBooks.Where(b => b.Authors.Where(a => a.FirstName == author.First && a.LastName == author.Last).Any());
 
@@ -57,31 +51,30 @@ public class Library : ILibrary
 	// TODO: might want to change return type...
 	public void LoanBook(ILibraryBook book, ILibraryUser user)
 	{
-		// if the book is able to be loaned out
-		//   then loan the book
-		// else 
-		//   do nothing ...??
-
-		if (IsAbleToBeBorrowed(book))
+		if (book.CanBeIssued)
 		{
-			_libraryBooksOnLoan.Add(user, new List<ILibraryBook> { book });
-			book.IssuedTo(user);
+			book.IssueTo(user);
 		}
 	}
 
-	private bool IsAbleToBeBorrowed(ILibraryBook book)
+	public void ReturnBook(ILibraryBook book, ILibraryUser user)
 	{
-		return !_libraryBooksOnLoan.Any(loans => loans.Value.Contains(book));
+		// assumption: if book cannot be issued, then is is onloan/issued
+		if(!book.CanBeIssued)
+		{
+			book.Returned(user);
+		}
 	}
 
-	public void ReturnBook(ILibraryBook book)
+	public void RemoveBook(ILibraryBook book, ILibraryUser user)
 	{
-		throw new NotImplementedException();
+		if(_libraryBooks.Contains(book))
+		{
+			_libraryBooks.Remove(book);
+			_libraryBookTransactions.Add(LibraryTransaction.BookRemovedFromLibrary(book, user));
+		}
 	}
 
 	private readonly List<ILibraryBook> _libraryBooks = new();
-	private readonly List<WishlistedBook> _wishlistedBooks = new();
 	private readonly List<LibraryTransaction> _libraryBookTransactions = new();
-
-	private readonly Dictionary<ILibraryUser, List<ILibraryBook>> _libraryBooksOnLoan = new();
 }

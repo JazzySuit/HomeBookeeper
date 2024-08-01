@@ -116,13 +116,7 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	public void Given_an_available_book_to_loan_when_loaning_out_a_book_then_the_book_state_is_updated_to_onloan_and_who_it_is_loaned_to()
 	{
 		// is the book lent out & to who?
-		ILibraryBook book = new LibraryBook(
-			"Book Title",
-			new Author("Bobb", "Bearly"),
-			BookType.FictionBook,
-			new Isbn10(1234567890),
-			"Book Publisher");
-
+		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 		library.AddNewBook(book, user);
@@ -144,107 +138,127 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	}
 
 	[Fact]
-	public void Given_a_user_has_a_book_on_loan_when_they_try_to_borrow_again_then_there_is_no_change_in_book_state()
+	public void Given_a_user_has_a_book_on_loan_when_they_try_to_borrow_the_book_again_then_there_is_no_change_in_book_state()
 	{
-		var isbn10 = new Isbn10 (1234567890);
-		ILibraryBook book = new LibraryBook(
-			"Book Title",
-			new Author("Bobb", "Bearly"),
-			BookType.FictionBook,
-			isbn10,
-			"Book Publisher");
-
+		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 
 		library.AddNewBook(book, user);
+		var initialTransactionCount = book.TransactionLog.Count;
+
 		library.LoanBook(book, user);
 		var firstBookState = library.GetBookState(book);
+		book.CanBeIssued.Should().BeFalse();
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
 
 		library.LoanBook(book, user);
 		var secondBookState = library.GetBookState(book);
 		secondBookState.Should().Be(firstBookState);
+		book.CanBeIssued.Should().BeFalse();
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
 	}
 
 	[Fact]
-	public void Given_a_book_is_on_loan_when_someone_tries_to_borrow_the_book_then_the_user_cannot_loan_out_the_book_and_the_state_and_record_are_unchanged()
+	public void Given_a_book_is_on_loan_when_someone_tries_to_borrow_the_book_then_the_user_cannot_loan_out_the_book()
 	{
-		var isbn10 = new Isbn10 (9876543210);
-
-		ILibraryBook book = new LibraryBook(
-			"Book Title",
-			new Author("Ben", "Boss"),
-			BookType.FictionBook,
-			isbn10,
-			"Book Publisher");
-
+		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
 		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
 		ILibraryUser userAlice = new LibraryUser("Alice", "Wonderland");
 
 		ILibrary library = new Library();
 
 		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		var initialTransactionCount = book.TransactionLog.Count;
+		book.CanBeIssued.Should().BeTrue();
+
 		library.LoanBook(book, userJoe);
+		book.CanBeIssued.Should().BeFalse();
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
 
 		var firstBookState = library.GetBookState(book);
-
+		
 		library.LoanBook(book, userAlice);
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
 
 		var secondBookState = library.GetBookState(book);
-
 		secondBookState.Should().Be(firstBookState);
 	}
 
+	[Fact]
+	public void Given_a_book_that_is_on_loan_when_the_book_is_returned_then_the_books_is_available()
+	{
+		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
+
+		ILibrary library = new Library();
+
+		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		book.CanBeIssued.Should().BeTrue();
+		var initialTransactionCount = book.TransactionLog.Count;
+
+		library.LoanBook(book, userJoe);
+		book.CanBeIssued.Should().BeFalse();
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
+
+		library.ReturnBook(book, userJoe);
+		book.CanBeIssued.Should().BeTrue();
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 2);
+	}
+
+	[Fact]
+	public void Given_a_book_that_is_on_loan_when_the_book_is_returned_then_the_book_can_be_issued_again()
+	{
+		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
+		ILibraryUser userAlice = new LibraryUser("Alice", "Wonderland");
+
+		ILibrary library = new Library();
+
+		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		
+		var initialTransactionCount = book.TransactionLog.Count;
+
+		library.LoanBook(book, userJoe);
+		library.ReturnBook(book, userJoe);
+
+		library.LoanBook(book, userAlice);
+		book.CanBeIssued.Should().BeFalse();
+		book.TransactionLog.Count.Should().Be(initialTransactionCount + 3);
+	}
+
+	[Fact]
+	public void Given_a_book_is_available_when_the_book_is_removed_from_the_library_then_the_book_cannot_be_issued()
+	{
+		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
+
+		ILibrary library = new Library();
+
+		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+
+		book.CanBeIssued.Should().BeTrue();
+
+		library.RemoveBook(book, userJoe);
+
+		var postState = library.GetBookState(book);
+		postState.Should().Be(LibraryBookState.RemovedFromLibrary);
+		book.CanBeIssued.Should().BeFalse();
+	}
+
 	//[Fact]
-	public void Returning_a_book_that_is_on_loan_sets_the_books_state_back_to_in_possession()
+	public void Given_a_book_has_been_removed_from_the_library_when_issuing_the_book_to_a_user_then_issuing_the_book_fails_and_the_state_remains_unchanged()
 	{
 		Assert.False(true);
 	}
 
 	//[Fact]
-	public void A_book_that_needs_to_be_repaired_has_its_state_set_to_needs_repair()
+	public void Given_a_book_has_been_removed_from_the_library_when_returning_the_book_then_returning_the_book_fails_and_the_state_remains_unchanged()
 	{
 		Assert.False(true);
 	}
 
-	//[Fact]
-	public void When_a_book_is_repaired_the_books_state_is_set_to_in_possession()
-	{
-		Assert.False(true);
-	}
-
-	//[Fact]
-	public void Selling_a_book_sets_a_books_state_to_sold()
-	{
-		Assert.False(true);
-	}
-
-	//[Fact]
-	public void A_book_that_has_been_sold_cannot_be_set_back_to_any_other_book_state()
-	{
-		Assert.False(true);
-	}
-
-	//[Fact]
-	public void Giving_away_a_book_sets_a_books_state_to_given_away()
-	{
-		Assert.False(true);
-	}
-
-	//[Fact]
-	public void A_book_that_has_been_given_away_cannot_be_set_back_to_any_other_book_state()
-	{
-		Assert.False(true);
-	}
-
-	//[Fact]
-	public void Destroying_a_book_sets_a_books_state_to_destroyed()
-	{
-		Assert.False(true);
-	}
-
-	//[Fact]
-	public void A_book_that_has_been_destroyed_cannot_be_set_back_to_any_other_book_state()
+	public void Given_a_book_has_been_removed_from_the_library_when_adding_the_book_back_into_the_library_then_the_book_is_available_again()
 	{
 		Assert.False(true);
 	}

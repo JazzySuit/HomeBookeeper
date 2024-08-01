@@ -18,7 +18,9 @@ public interface ILibraryBook : IBook
 
 	bool CanBeIssued { get; }
 
-	void IssuedTo(ILibraryUser user);
+	void IssueTo(ILibraryUser user);
+
+	void Returned(ILibraryUser user);
 }
 
 public interface IBook 

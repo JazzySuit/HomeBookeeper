@@ -14,7 +14,7 @@ public interface ILibrary
 
 	void LoanBook(ILibraryBook book, ILibraryUser user);
 
-	void ReturnBook(ILibraryBook book);
+	void ReturnBook(ILibraryBook book, ILibraryUser user);
 
-	(BookStatus BookStatus, string ToUser) GetLibraryBookState(ILibraryBook book);
+	void RemoveBook(ILibraryBook book, ILibraryUser user);
 }

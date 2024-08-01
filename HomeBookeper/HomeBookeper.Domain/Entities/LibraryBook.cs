@@ -79,9 +79,14 @@ public class LibraryBook : BaseEntity, ILibraryBook
 		}
 	}
 
-	public void IssuedTo(ILibraryUser user)
+	public void IssueTo(ILibraryUser user)
 	{
 		_transactionLog.Add(BookTransaction.BookIssuedToUser(this, user));
+	}
+
+	public void Returned(ILibraryUser user)
+	{
+		_transactionLog.Add(BookTransaction.BookReturnedByUser(this, user));
 	}
 
 	private readonly List<Author> _authors = new ();
