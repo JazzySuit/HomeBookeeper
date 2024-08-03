@@ -233,10 +233,20 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 		searchedBook.Should().Be(removedBook);
 	}
 
-	//[Fact]
-	public void Given_a_book_has_been_removed_from_the_library_when_issuing_the_book_to_a_user_then_issuing_the_book_fails_and_the_state_remains_unchanged()
+	[Fact]
+	public void Given_a_book_has_been_removed_from_the_library_when_adding_the_book_to_the_library_then_the_book_is_available_again()
 	{
-		Assert.False(true);
+		var book = _libraryTestFixture.CreateANewBook("A removed book returned");
+		ILibraryUser userJoe = new LibraryUser("Jim", "Bobby");
+		ILibrary library = new Library();
+
+		var availableBook = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+
+		var removedBook = library.RemoveBook(availableBook, userJoe);
+
+		var removeBookAdded = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		removeBookAdded.Should().NotBeNull();
+		removeBookAdded.Should().BeEquivalentTo(availableBook);
 	}
 
 	//[Fact]

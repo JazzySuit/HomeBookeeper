@@ -10,23 +10,36 @@ public class Library : ILibrary
 {
 	public AvailableBook AddNewBook(NewBook book, ILibraryUser addedByUser)
 	{
-		var libBook = _libraryBooks.Where(b => b.Isbn == book.Isbn).SingleOrDefault();
+		var addedBook = GetBook(book) switch
+		{
+			null => AddBook(book, addedByUser),
+			AvailableBook a => a,
+			IssuedBook i => throw new InvalidBookException($"The book, {book.Title}, has already been added to the library. It is not currently issued to {i.IssuedTo}"),
+			RemovedBook r => AddBook(r, addedByUser),
+			_ => throw new InvalidBookException($"The book, {book.Title}, is in an unexpected state when issuing the book")
+		};
 
-		if (libBook is null)
-		{
-			var makeBookAvailable = AvailableBook.Create(book);
-			_libraryBooks.Add(makeBookAvailable);
-			_libraryBookTransactions.Add(LibraryTransaction.BookAddedToLibrary(book, addedByUser));
-			return makeBookAvailable;
-		}
-		else if (libBook is AvailableBook ab)
-		{
-			return ab;
-		}
-		else
-		{
-			throw new InvalidBookException("This book has already been added to the library, but it is not available at this point");
-		}
+		return addedBook;
+	}
+
+	private AvailableBook AddBook(NewBook book, ILibraryUser addedByUser)
+	{
+		var makeBookAvailable = AvailableBook.Create(book);
+		_libraryBooks.Add(makeBookAvailable);
+		_libraryBookTransactions.Add(LibraryTransaction.BookAddedToLibrary(book, addedByUser));
+
+		return makeBookAvailable;
+	}
+
+	private AvailableBook AddBook(RemovedBook book, ILibraryUser addedByUser)
+	{
+		_libraryBooks.Remove(book);
+
+		var makeBookAvailable = AvailableBook.ReturnRemoved(book);
+		_libraryBooks.Add(makeBookAvailable);
+		_libraryBookTransactions.Add(LibraryTransaction.BookAddedToLibrary(book, addedByUser));
+
+		return makeBookAvailable;
 	}
 
 	public ILibraryBookType? GetBook(ILibraryBookType book) 

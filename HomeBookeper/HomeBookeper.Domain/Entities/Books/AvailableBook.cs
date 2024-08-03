@@ -10,6 +10,8 @@ public class AvailableBook : ILibraryBookType
 
 	internal static AvailableBook Return(IssuedBook book) => new AvailableBook(book);
 
+	internal static AvailableBook ReturnRemoved(RemovedBook book) => new AvailableBook(book);
+
 	private AvailableBook(ILibraryBookType book)
 	{
 		Isbn = book.Isbn;
