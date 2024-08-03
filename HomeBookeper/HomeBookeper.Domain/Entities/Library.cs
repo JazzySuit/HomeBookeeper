@@ -1,4 +1,6 @@
-﻿using HomeBookeper.Domain.Enums;
+﻿using HomeBookeper.Domain.Entities.Books;
+using HomeBookeper.Domain.Exceptions;
+using HomeBookeper.Domain.Extensions;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.Values;
 
@@ -6,75 +8,125 @@ namespace HomeBookeper.Domain.Entities;
 
 public class Library : ILibrary
 {
-	public void AddNewBook(ILibraryBook book, ILibraryUser addedByUser)
+	public AvailableBook AddNewBook(NewBook book, ILibraryUser addedByUser)
 	{
-		if (_libraryBooks.Contains(book))
-			return;
+		var libBook = _libraryBooks.Where(b => b.Isbn == book.Isbn).SingleOrDefault();
 
-		_libraryBooks.Add(book);
-		_libraryBookTransactions.Add(LibraryTransaction.BookAddedToLibrary(book, addedByUser));
+		if (libBook is null)
+		{
+			var makeBookAvailable = AvailableBook.Create(book);
+			_libraryBooks.Add(makeBookAvailable);
+			_libraryBookTransactions.Add(LibraryTransaction.BookAddedToLibrary(book, addedByUser));
+			return makeBookAvailable;
+		}
+		else if (libBook is AvailableBook ab)
+		{
+			return ab;
+		}
+		else
+		{
+			throw new InvalidBookException("This book has already been added to the library, but it is not available at this point");
+		}
 	}
 
-	public LibraryBookState GetBookState(ILibraryBook book)
-	{
-		if (_libraryBooks.Contains(book))
-			return LibraryBookState.IsAnAvailableBook;
-		else if (_libraryBookTransactions
-					.Where(t => t.Value.Isbn == book.Isbn)
-					.Where(t => t.Action == LibraryTransactionType.BookRemoved)
-					.LastOrDefault() is not null)
-			return LibraryBookState.RemovedFromLibrary;
+	public ILibraryBookType? GetBook(ILibraryBookType book) 
+		=> _libraryBooks.Where(b => b.Isbn == book.Isbn).SingleOrDefault();
 
-		return LibraryBookState.NotInLibrary;
-	}
-
-	public IEnumerable<ILibraryBook> FindBook(SearchableBookProperties searchProp)
+	public IEnumerable<ILibraryBookType> FindBook(SearchableBookProperties searchProp)
 	{
 		return searchProp switch
 		{
 			Title title => FindBookByTitle(title),
 			Isbn isbn => FindBookByIsbn(isbn),
 			AuthorName author => FindBookByAuthor(author),
-			_ => new List<ILibraryBook>()
+			_ => new List<ILibraryBookType>()
 		};
 	}
 
-	private IEnumerable<ILibraryBook> FindBookByAuthor(AuthorName author)
+	private IEnumerable<ILibraryBookType> FindBookByAuthor(AuthorName author)
 		=> _libraryBooks.Where(b => b.Authors.Where(a => a.FirstName == author.First && a.LastName == author.Last).Any());
 
-	private IEnumerable<ILibraryBook> FindBookByTitle(Title title)
-		=> _libraryBooks.Where(b => b.Title == title.T);
+	private IEnumerable<ILibraryBookType> FindBookByTitle(Title title)
+		=> _libraryBooks.Where(b => b.Title.AsSearchable() == title);
 
-	private IEnumerable<ILibraryBook> FindBookByIsbn(Isbn isbnNumber)
+	private IEnumerable<ILibraryBookType> FindBookByIsbn(Isbn isbnNumber)
 		=> _libraryBooks.Where(book => book.Isbn == isbnNumber);
 
-	// TODO: might want to change return type...
-	public void LoanBook(ILibraryBook book, ILibraryUser user)
+	public IssuedBook LoanBook(AvailableBook book, ILibraryUser user)
 	{
-		if (book.CanBeIssued)
+		var issuedBook = GetBook(book) switch
 		{
-			book.IssueTo(user);
-		}
+			AvailableBook a => IssueBook(a, user),
+			IssuedBook i => i,
+			RemovedBook r => throw new InvalidBookException($"Cannot issue the book, {r.Title}, as it has been removed from the library."),
+			_ => throw new InvalidBookException($"The book, {book.Title}, is in an unexpected state when issuing the book")
+		};
+
+		return issuedBook;
 	}
 
-	public void ReturnBook(ILibraryBook book, ILibraryUser user)
+	private IssuedBook IssueBook(AvailableBook book, ILibraryUser user)
 	{
-		// assumption: if book cannot be issued, then is is onloan/issued
-		if(!book.CanBeIssued)
-		{
-			book.Returned(user);
-		}
+		var issuedBook = IssuedBook.Create(book, user);
+		_libraryBooks.Remove(book);
+		_libraryBooks.Add(issuedBook);
+
+		return issuedBook;
 	}
 
-	public void RemoveBook(ILibraryBook book, ILibraryUser user)
+	public AvailableBook ReturnBook(IssuedBook book, ILibraryUser user)
 	{
-		if(_libraryBooks.Contains(book))
+		var issuedBook = GetBook(book) switch
 		{
-			_libraryBooks.Remove(book);
-			_libraryBookTransactions.Add(LibraryTransaction.BookRemovedFromLibrary(book, user));
-		}
+			AvailableBook a => a,
+			IssuedBook i => ReturnIssuedBook(i, user),
+			RemovedBook r => throw new InvalidBookException($"Cannot issue the book, {r.Title}, as it has been removed from the library."),
+			_ => throw new InvalidBookException($"The book, {book.Title}, is in an unexpected state when issuing the book")
+		};
+
+		return issuedBook;
 	}
 
-	private readonly List<ILibraryBook> _libraryBooks = new();
+	private AvailableBook ReturnIssuedBook(IssuedBook issuedBook, ILibraryUser user)
+	{
+		var returnedBook = AvailableBook.Return(issuedBook);
+		_libraryBooks.Remove(issuedBook);
+		_libraryBooks.Add(returnedBook);
+
+		return returnedBook;
+	}
+
+	public RemovedBook RemoveBook(ILibraryBookType book, ILibraryUser user)
+	{
+		var libraryBook = GetBook(book) switch
+		{
+			AvailableBook a => RemoveAvailableBook(a, user),
+			IssuedBook i => RemoveIssuedBook(i, user),
+			RemovedBook r => r,
+			_ => throw new InvalidBookException($"The book, {book.Title}, is in an unexpected state when issuing the book")
+		};
+
+		return libraryBook;
+	}
+
+	private RemovedBook RemoveAvailableBook(AvailableBook book, ILibraryUser user)
+	{
+		var removedBook = RemovedBook.Remove(book);
+		_libraryBooks.Remove(book);
+		_libraryBooks.Add(removedBook);
+
+		return removedBook;
+	}
+
+	private RemovedBook RemoveIssuedBook(IssuedBook book, ILibraryUser user)
+	{
+		var removedBook = RemovedBook.Remove(book);
+		_libraryBooks.Remove(book);
+		_libraryBooks.Add(removedBook);
+
+		return removedBook;
+	}
+
+	private readonly List<ILibraryBookType> _libraryBooks = new();
 	private readonly List<LibraryTransaction> _libraryBookTransactions = new();
 }

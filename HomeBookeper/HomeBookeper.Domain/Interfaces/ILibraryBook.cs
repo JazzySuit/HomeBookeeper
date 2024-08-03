@@ -4,6 +4,14 @@ using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Interfaces;
 
+public interface ILibraryBookType 
+{
+	public Isbn Isbn { get; }
+	public BookTitle Title { get; }
+
+	public IReadOnlyCollection<Author> Authors { get; }
+}
+
 public interface ILibraryBook : IBook
 {
 	Isbn Isbn { get; }

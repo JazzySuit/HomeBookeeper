@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using HomeBookeper.Domain.Entities;
-using HomeBookeper.Domain.Enums;
+using HomeBookeper.Domain.Entities.Books;
+using HomeBookeper.Domain.Extensions;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.UnitTests.Fixture;
 using HomeBookeper.Domain.Values;
@@ -20,7 +21,7 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	[Fact]
 	public void Given_a_new_book_when_adding_it_to_the_library_then_the_book_should_be_able_to_be_found_by_its_isbn()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 
@@ -40,16 +41,16 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	[Fact]
 	public void Given_a_new_book_when_adding_it_to_the_library_then_the_book_should_be_able_to_be_found_by_its_title()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 
-		var emptyBookList = library.FindBook(new Title(book.Title));
+		var emptyBookList = library.FindBook(book.Title.AsSearchable());
 		emptyBookList.Should().NotBeNull();
 		emptyBookList.Should().BeEmpty();
 
 		library.AddNewBook(book, user);
-		var addedBook = library.FindBook(new Title(book.Title));
+		var addedBook = library.FindBook(book.Title.AsSearchable());
 
 		addedBook.Should().NotBeNull();
 		addedBook.Count().Should().Be(1);
@@ -59,19 +60,19 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	[Fact]
 	public void Given_a_new_book_when_adding_it_to_the_library_then_the_book_should_be_able_to_be_found_by_its_author()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 
-		var booksAuthor = book.Authors.First();
+		var searchAuthor = book.Authors.First().AsSearchAble();
 
-		var emptyBookList = library.FindBook(new AuthorName(booksAuthor.FirstName, booksAuthor.LastName));
+		var emptyBookList = library.FindBook(searchAuthor);
 		emptyBookList.Should().NotBeNull();
 		emptyBookList.Should().BeEmpty();
 
 		library.AddNewBook(book, user);
 		
-		var addedBook = library.FindBook(new AuthorName(booksAuthor.FirstName, booksAuthor.LastName));
+		var addedBook = library.FindBook(searchAuthor);
 
 		addedBook.Should().NotBeNull();
 		addedBook.Count().Should().Be(1);
@@ -82,168 +83,154 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	public void Given_a_duplicate_book_when_added_to_the_library_then_the_book_does_not_get_added_again()
 	{
 		// TODO: future feature - to allow adding multiple of the same books
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, user);
+		var addedBook = library.AddNewBook(book, user);
 
-		var addBookToLibrary = () => library.AddNewBook(book, user);
-		addBookToLibrary.Should().NotThrow();
+		var addingBookAgain = () => library.AddNewBook(book, user);
+		addingBookAgain.Should().NotThrow();
 
-		var addedBook = library.FindBook(book.Isbn);
-		addedBook.Count().Should().Be(1);
-		addedBook.First().Should().BeEquivalentTo(book);
+		var availableBook = library.FindBook(book.Isbn);
+		availableBook.Count().Should().Be(1);
+		availableBook.First().Should().Be(addedBook);
 	}
 
 	[Fact]
 	public void Given_a_new_book_when_it_is_added_to_the_library_then_the_book_is_available_from_the_library_and_ready_to_be_issued()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, user);
+		var addedBook = library.AddNewBook(book, user);
 
-		var bookState = library.GetBookState(book);
-		bookState.Should().Be(LibraryBookState.IsAnAvailableBook);
-
-		book.CanBeIssued.Should().BeTrue();
+		var availableBook = library.GetBook(book);
+		availableBook.Should().BeOfType(typeof(AvailableBook));
+		addedBook.Should().BeEquivalentTo(availableBook);
 	}
 
 	[Fact]
-	public void Given_an_available_book_to_loan_when_loaning_out_a_book_then_the_book_state_is_updated_to_onloan_and_who_it_is_loaned_to()
+	public void Given_an_available_book_when_loaning_the_available_book_then_the_book_state_is_updated_to_issued_and_who_it_is_loaned_to()
 	{
 		// is the book lent out & to who?
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
-		library.AddNewBook(book, user);
-
-		var availableBook = library.FindBook(book.Isbn).Single();
+		
+		var availableBook = library.AddNewBook(book, user);
 		availableBook.Should().NotBeNull();
-		availableBook.Should().BeEquivalentTo(book);
-		library.GetBookState(availableBook!).Should().Be(LibraryBookState.IsAnAvailableBook);
-		availableBook!.CanBeIssued.Should().BeTrue();
 
-		library.LoanBook(book, user);
+		var issuedBook = library.LoanBook(availableBook!, user);
+		issuedBook.Should().NotBeNull();
 
-		var loanedBook = library.FindBook(book.Isbn).Single();
-		loanedBook.Should().NotBeNull();
-		loanedBook.Should().BeEquivalentTo(book);
-		library.GetBookState(loanedBook!).Should().Be(LibraryBookState.IsAnAvailableBook);
-		library.GetBookState(availableBook!).Should().Be(LibraryBookState.IsAnAvailableBook);
-		loanedBook!.CanBeIssued.Should().BeFalse();
+		var bookIssuedTo = library.GetBook(issuedBook!) switch
+		{
+			IssuedBook i => i.IssuedTo,
+			_ => throw new Exception($"Wrong type returned. Expected an {typeof(IssuedBook)} type.")
+		};
+		bookIssuedTo.Should().NotBeNull();
+		bookIssuedTo.Should().BeEquivalentTo(user);
 	}
 
 	[Fact]
-	public void Given_a_user_has_a_book_on_loan_when_they_try_to_borrow_the_book_again_then_there_is_no_change_in_book_state()
+	public void Given_a_user_has_a_book_on_loan_when_they_try_to_borrow_the_book_again_then_there_is_no_change_in_the_book_state()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, user);
-		var initialTransactionCount = book.TransactionLog.Count;
+		var availableBook = library.AddNewBook(book, user);
 
-		library.LoanBook(book, user);
-		var firstBookState = library.GetBookState(book);
-		book.CanBeIssued.Should().BeFalse();
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
+		var firstLoan = library.LoanBook(availableBook, user);
+		firstLoan.Should().NotBeNull();
+		
+		var firstStateA = library.GetBook(availableBook);
+		var firstStateB = library.GetBook(firstLoan);
+		firstStateA.Should().NotBeNull();
+		firstStateA.Should().BeEquivalentTo(firstStateB);
 
-		library.LoanBook(book, user);
-		var secondBookState = library.GetBookState(book);
-		secondBookState.Should().Be(firstBookState);
-		book.CanBeIssued.Should().BeFalse();
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
+		var secondLoan = library.LoanBook(availableBook, user);
+		secondLoan.Should().NotBeNull();
+
+		var secondState = library.GetBook(secondLoan);
+		secondState.Should().BeEquivalentTo(firstStateB);
+
+		secondLoan.Should().Be(firstLoan);
 	}
 
 	[Fact]
-	public void Given_a_book_is_on_loan_when_someone_tries_to_borrow_the_book_then_the_user_cannot_loan_out_the_book()
+	public void Given_a_book_is_issued_when_someone_tries_to_borrow_the_book_then_the_user_is_not_issued_the_book()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
 		ILibraryUser userAlice = new LibraryUser("Alice", "Wonderland");
-
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
-		var initialTransactionCount = book.TransactionLog.Count;
-		book.CanBeIssued.Should().BeTrue();
-
-		library.LoanBook(book, userJoe);
-		book.CanBeIssued.Should().BeFalse();
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
-
-		var firstBookState = library.GetBookState(book);
+		var availableBook = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
 		
-		library.LoanBook(book, userAlice);
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
+		var issuedBook = library.LoanBook(availableBook, userJoe);
+		var firstBookState = library.GetBook(issuedBook);
+		
+		var issuedBookAttempt = library.LoanBook(availableBook, userAlice);
+		var secondBookState = library.GetBook(issuedBookAttempt);
 
-		var secondBookState = library.GetBookState(book);
+		issuedBook.IssuedTo.Should().Be(userJoe);
+		issuedBook.Should().Be(issuedBookAttempt);
 		secondBookState.Should().Be(firstBookState);
 	}
 
 	[Fact]
-	public void Given_a_book_that_is_on_loan_when_the_book_is_returned_then_the_books_is_available()
+	public void Given_a_book_that_is_issued_when_the_book_is_returned_then_the_book_is_available()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
-
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
-		book.CanBeIssued.Should().BeTrue();
-		var initialTransactionCount = book.TransactionLog.Count;
-
-		library.LoanBook(book, userJoe);
-		book.CanBeIssued.Should().BeFalse();
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 1);
-
-		library.ReturnBook(book, userJoe);
-		book.CanBeIssued.Should().BeTrue();
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 2);
+		var availableBook = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		
+		var issuedBook = library.LoanBook(availableBook, userJoe);
+		
+		var returnedBook = library.ReturnBook(issuedBook, userJoe);
+		returnedBook.Should().BeEquivalentTo(availableBook);
 	}
 
 	[Fact]
-	public void Given_a_book_that_is_on_loan_when_the_book_is_returned_then_the_book_can_be_issued_again()
+	public void Given_a_book_that_is_issued_when_the_book_is_returned_then_the_book_can_be_issued_again()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
 		ILibraryUser userAlice = new LibraryUser("Alice", "Wonderland");
-
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
-		
-		var initialTransactionCount = book.TransactionLog.Count;
+		var availableBook = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
 
-		library.LoanBook(book, userJoe);
-		library.ReturnBook(book, userJoe);
+		var issuedBook = library.LoanBook(availableBook, userJoe);
 
-		library.LoanBook(book, userAlice);
-		book.CanBeIssued.Should().BeFalse();
-		book.TransactionLog.Count.Should().Be(initialTransactionCount + 3);
+		var returnedBook = library.ReturnBook(issuedBook, userJoe);
+
+		var issuedAgain = library.LoanBook(returnedBook, userAlice);
+		issuedAgain.Should().NotBeNull();
+		issuedAgain.IssuedTo.Should().Be(userAlice);
 	}
 
 	[Fact]
-	public void Given_a_book_is_available_when_the_book_is_removed_from_the_library_then_the_book_cannot_be_issued()
+	public void Given_a_book_is_available_when_the_book_is_removed_from_the_library_then_the_book_state_is_updated_on_search()
 	{
-		ILibraryBook book = _libraryTestFixture.CreateAValidBook();
+		var book = _libraryTestFixture.CreateANewBook();
 		ILibraryUser userJoe = new LibraryUser("Joe", "Bloggs");
-
 		ILibrary library = new Library();
 
-		library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		var availableBook = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
 
-		book.CanBeIssued.Should().BeTrue();
+		var removedBook = library.RemoveBook(availableBook, userJoe);
+		removedBook.Should().NotBeNull();
 
-		library.RemoveBook(book, userJoe);
-
-		var postState = library.GetBookState(book);
-		postState.Should().Be(LibraryBookState.RemovedFromLibrary);
-		book.CanBeIssued.Should().BeFalse();
+		var searchedBook = library.GetBook(removedBook);
+		searchedBook.Should().NotBeNull();
+		searchedBook.Should().Be(removedBook);
 	}
 
 	//[Fact]

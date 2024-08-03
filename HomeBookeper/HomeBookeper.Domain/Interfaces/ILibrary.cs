@@ -1,20 +1,19 @@
-﻿using HomeBookeper.Domain.Entities;
-using HomeBookeper.Domain.Enums;
+﻿using HomeBookeper.Domain.Entities.Books;
 using HomeBookeper.Domain.Values;
 
 namespace HomeBookeper.Domain.Interfaces;
 
 public interface ILibrary
 {
-	void AddNewBook(ILibraryBook book, ILibraryUser addedByUser);
+	AvailableBook AddNewBook(NewBook book, ILibraryUser addedByUser);
 
-	LibraryBookState GetBookState(ILibraryBook book);
+	ILibraryBookType? GetBook(ILibraryBookType book);
 
-	IEnumerable<ILibraryBook> FindBook(SearchableBookProperties searchProp);
+	IEnumerable<ILibraryBookType> FindBook(SearchableBookProperties searchProp);
 
-	void LoanBook(ILibraryBook book, ILibraryUser user);
+	IssuedBook LoanBook(AvailableBook book, ILibraryUser user);
 
-	void ReturnBook(ILibraryBook book, ILibraryUser user);
+	AvailableBook ReturnBook(IssuedBook book, ILibraryUser user);
 
-	void RemoveBook(ILibraryBook book, ILibraryUser user);
+	RemovedBook RemoveBook(ILibraryBookType book, ILibraryUser user);
 }

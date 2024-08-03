@@ -1,4 +1,5 @@
 ﻿using HomeBookeper.Domain.Entities;
+using HomeBookeper.Domain.Entities.Books;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.Values;
 
@@ -20,6 +21,12 @@ public class LibraryTestFixture
 					BookType.FictionBook,
 					isIsbn13 ? new Isbn13(RandomIsbn13()) : new Isbn10(RandomIsbn10()),
 					"Book Publisher");
+
+	public NewBook CreateANewBook(string title = "A new book", bool isIsbn13 = false)
+		=> NewBook.Create(
+				isIsbn13 ? new Isbn13(RandomIsbn13()) : new Isbn10(RandomIsbn10()),
+				title,
+				new Author("Bobb", "Bearly"));
 
 	private long RandomIsbn10()
 		=> LongRandom(min: 1000000000, max: 9999999999);

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using HomeBookeper.Domain.Entities;
+using HomeBookeper.Domain.Exceptions;
 using Xunit;
 
 namespace HomeBookeper.Domain.UnitTests;
@@ -30,7 +31,7 @@ public class AuthorTests
 	[Fact]
 	public void Attempting_to_create_an_invalid_author_throws_an_exception()
 	{
-		Assert.Throws<ArgumentException>(() => new Author(string.Empty, string.Empty));
+		Assert.Throws<InvalidAuthorException>(() => new Author(string.Empty, string.Empty));
 	}
 
 

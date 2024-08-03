@@ -1,4 +1,5 @@
 ﻿using HomeBookeper.Domain.Common;
+using HomeBookeper.Domain.Exceptions;
 
 namespace HomeBookeper.Domain.Entities;
 
@@ -8,12 +9,12 @@ public class Author : BaseEntity
 	{
 		if (string.IsNullOrWhiteSpace(firstName))
 		{
-			throw new ArgumentException($"An author must have a {nameof(firstName)}");
+			throw new InvalidAuthorException($"An author must have a {nameof(firstName)}");
 		}
 
 		if (string.IsNullOrWhiteSpace(lastName))
 		{
-			throw new ArgumentException($"An author must have a {nameof(lastName)}");
+			throw new InvalidAuthorException($"An author must have a {nameof(lastName)}");
 		}
 
 		FirstName = firstName;
