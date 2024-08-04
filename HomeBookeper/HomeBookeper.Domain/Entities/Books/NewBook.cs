@@ -6,11 +6,11 @@ namespace HomeBookeper.Domain.Entities.Books;
 
 public class NewBook : ILibraryBookType
 {
-	public static NewBook Create(Isbn isbn, BookTitle title, Author author) => new(isbn, title, author);
+	public static NewBook Create(Isbn isbn, Title title, Author author) => new(isbn, title, author);
 
 	public static NewBook Create(Isbn isbn, string title, Author author)
 	{
-		var bookTitle = new BookTitle(title);
+		var bookTitle = new Title(title);
 
 		return Create(isbn, bookTitle, author);
 	}
@@ -22,7 +22,7 @@ public class NewBook : ILibraryBookType
 		return Create(isbn, title, author);
 	}
 
-	private NewBook(Isbn isbn, BookTitle title, Author author)
+	private NewBook(Isbn isbn, Title title, Author author)
 	{
 		Isbn = isbn ?? throw new InvalidBookException($"The book {nameof(isbn)} cannot be null");
 		Title = title ?? throw new InvalidBookException($"The books {nameof(title)} cannot be null");
@@ -31,7 +31,7 @@ public class NewBook : ILibraryBookType
 	}
 
 	public Isbn Isbn { get; init; }
-	public BookTitle Title { get; init;  }
+	public Title Title { get; init;  }
 
 	public IReadOnlyCollection<Author> Authors => _authors.AsReadOnly();
 

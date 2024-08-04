@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using HomeBookeper.Domain.Entities;
 using HomeBookeper.Domain.Entities.Books;
+using HomeBookeper.Domain.Exceptions;
 using HomeBookeper.Domain.Extensions;
 using HomeBookeper.Domain.Interfaces;
 using HomeBookeper.Domain.UnitTests.Fixture;
@@ -38,6 +39,7 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 		addedBook.Count().Should().Be(1);
 		addedBook.First().Should().BeEquivalentTo(book);
 	}
+
 	[Fact]
 	public void Given_a_new_book_when_adding_it_to_the_library_then_the_book_should_be_able_to_be_found_by_its_title()
 	{
@@ -80,6 +82,21 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	}
 
 	[Fact]
+	public void Given_a_new_book_when_it_is_added_to_the_library_then_the_book_is_available_from_the_library_and_ready_to_be_issued()
+	{
+		var book = _libraryTestFixture.CreateANewBook();
+		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
+
+		ILibrary library = new Library();
+
+		var addedBook = library.AddNewBook(book, user);
+
+		var availableBook = library.GetBook(book);
+		availableBook.Should().BeOfType(typeof(AvailableBook));
+		addedBook.Should().BeEquivalentTo(availableBook);
+	}
+
+	[Fact]
 	public void Given_a_duplicate_book_when_added_to_the_library_then_the_book_does_not_get_added_again()
 	{
 		// TODO: future feature - to allow adding multiple of the same books
@@ -96,22 +113,6 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 		availableBook.Count().Should().Be(1);
 		availableBook.First().Should().Be(addedBook);
 	}
-
-	[Fact]
-	public void Given_a_new_book_when_it_is_added_to_the_library_then_the_book_is_available_from_the_library_and_ready_to_be_issued()
-	{
-		var book = _libraryTestFixture.CreateANewBook();
-		ILibraryUser user = new LibraryUser("Joe", "Bloggs");
-
-		ILibrary library = new Library();
-
-		var addedBook = library.AddNewBook(book, user);
-
-		var availableBook = library.GetBook(book);
-		availableBook.Should().BeOfType(typeof(AvailableBook));
-		addedBook.Should().BeEquivalentTo(availableBook);
-	}
-
 	[Fact]
 	public void Given_an_available_book_when_loaning_the_available_book_then_the_book_state_is_updated_to_issued_and_who_it_is_loaned_to()
 	{
@@ -217,6 +218,21 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 	}
 
 	[Fact]
+	public void Given_a_book_that_is_issued_when_the_book_is_added_again_then_an_error_occurs()
+	{
+		var book = _libraryTestFixture.CreateANewBook();
+		ILibraryUser userJoe = new LibraryUser("Jim", "Bob");
+		ILibrary library = new Library();
+
+		var availableBook = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+		var issuedBook = library.LoanBook(availableBook, userJoe);
+
+		var addBookAgain = () => library.AddNewBook(book, new LibraryUser("Library", "Admin"));
+
+		addBookAgain.Should().Throw<InvalidBookException>();
+	}
+
+	[Fact]
 	public void Given_a_book_is_available_when_the_book_is_removed_from_the_library_then_the_book_state_is_updated_on_search()
 	{
 		var book = _libraryTestFixture.CreateANewBook();
@@ -247,16 +263,5 @@ public class LibraryTests : IClassFixture<LibraryTestFixture>
 		var removeBookAdded = library.AddNewBook(book, new LibraryUser("Library", "Admin"));
 		removeBookAdded.Should().NotBeNull();
 		removeBookAdded.Should().BeEquivalentTo(availableBook);
-	}
-
-	//[Fact]
-	public void Given_a_book_has_been_removed_from_the_library_when_returning_the_book_then_returning_the_book_fails_and_the_state_remains_unchanged()
-	{
-		Assert.False(true);
-	}
-
-	public void Given_a_book_has_been_removed_from_the_library_when_adding_the_book_back_into_the_library_then_the_book_is_available_again()
-	{
-		Assert.False(true);
 	}
 }

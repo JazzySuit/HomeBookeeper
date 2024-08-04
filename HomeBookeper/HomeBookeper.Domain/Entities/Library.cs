@@ -49,17 +49,17 @@ public class Library : ILibrary
 	{
 		return searchProp switch
 		{
-			Title title => FindBookByTitle(title),
+			SearchTitle title => FindBookByTitle(title),
 			Isbn isbn => FindBookByIsbn(isbn),
-			AuthorName author => FindBookByAuthor(author),
+			SearchAuthor author => FindBookByAuthor(author),
 			_ => new List<ILibraryBookType>()
 		};
 	}
 
-	private IEnumerable<ILibraryBookType> FindBookByAuthor(AuthorName author)
+	private IEnumerable<ILibraryBookType> FindBookByAuthor(SearchAuthor author)
 		=> _libraryBooks.Where(b => b.Authors.Where(a => a.FirstName == author.First && a.LastName == author.Last).Any());
 
-	private IEnumerable<ILibraryBookType> FindBookByTitle(Title title)
+	private IEnumerable<ILibraryBookType> FindBookByTitle(SearchTitle title)
 		=> _libraryBooks.Where(b => b.Title.AsSearchable() == title);
 
 	private IEnumerable<ILibraryBookType> FindBookByIsbn(Isbn isbnNumber)

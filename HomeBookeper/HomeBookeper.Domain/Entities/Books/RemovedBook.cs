@@ -18,7 +18,7 @@ public class RemovedBook : ILibraryBookType
 
 	public Isbn Isbn { get; init; }
 
-	public BookTitle Title { get; init; }
+	public Title Title { get; init; }
 
 	public IReadOnlyCollection<Author> Authors => _authors.AsReadOnly();
 

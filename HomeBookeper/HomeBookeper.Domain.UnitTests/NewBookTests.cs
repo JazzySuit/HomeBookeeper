@@ -20,7 +20,7 @@ public class NewBookTests :  IClassFixture<BookTestFixture>
 	public void Given_a_book_title_when_creating_a_title_then_there_is_a_validated_digital_instance()
 	{
 		// happy path
-		var createTitle = () => new BookTitle("testing book titles");
+		var createTitle = () => new Title("testing book titles");
 
 		createTitle.Should().NotThrow();
 
@@ -32,7 +32,7 @@ public class NewBookTests :  IClassFixture<BookTestFixture>
 	[Fact]
 	public void Given_an_empty_book_title_when_creating_a_title_then_validation_fails()
 	{
-		var createTitle = () => new BookTitle(string.Empty);
+		var createTitle = () => new Title(string.Empty);
 
 		createTitle.Should().Throw<InvalidTitleException>();
 	}
@@ -40,7 +40,7 @@ public class NewBookTests :  IClassFixture<BookTestFixture>
 	[Fact]
 	public void Given_only_whitespace_for_a_book_title_when_creating_a_title_then_validation_fails()
 	{
-		var createTitle = () => new BookTitle(" \t\n\r");
+		var createTitle = () => new Title(" \t\n\r");
 
 		createTitle.Should().Throw<InvalidTitleException>();
 	}
@@ -48,7 +48,7 @@ public class NewBookTests :  IClassFixture<BookTestFixture>
 	[Fact]
 	public void Given_no_book_title_when_creating_a_title_then_validation_fails()
 	{
-		var createTitle = () => new BookTitle(null);
+		var createTitle = () => new Title(null);
 
 		createTitle.Should().Throw<InvalidTitleException>();
 	}
@@ -58,7 +58,7 @@ public class NewBookTests :  IClassFixture<BookTestFixture>
 	{
 		// happy path
 		var createNewBookA = () => NewBook.Create(_fixture.GenerateValidIsbn10(),
-			new BookTitle("The book of all books"),
+			new Title("The book of all books"),
 			_fixture.ValidAuthor);
 
 		var createNewBookB = () => NewBook.Create(_fixture.GenerateValidIsbn10(),
@@ -99,7 +99,7 @@ public class NewBookTests :  IClassFixture<BookTestFixture>
 	[Fact]
 	public void Given_no_book_title_when_creating_a_new_book_then_fail_to_create_a_digital_instance()
 	{
-		BookTitle title = null;
+		Title title = null;
 		var createNewBook = () => NewBook.Create(_fixture.GenerateValidIsbn10(),
 			title,
 			_fixture.ValidAuthor);

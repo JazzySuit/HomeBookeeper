@@ -5,9 +5,9 @@ namespace HomeBookeper.Domain.Extensions;
 
 public static class DomainValueExtensions
 {
-	public static Title AsSearchable(this BookTitle title)
+	public static SearchTitle AsSearchable(this Title title)
 		=> new(title.Value);
 
-	public static AuthorName AsSearchAble(this Author author)
+	public static SearchAuthor AsSearchAble(this Author author)
 		=> new(author.FirstName, author.LastName);
 }
