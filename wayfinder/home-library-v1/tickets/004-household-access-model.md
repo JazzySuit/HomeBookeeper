@@ -2,7 +2,7 @@
 title: Household access model
 label: wayfinder:grilling
 status: open
-assignee:
+assignee: jazzysuit
 blocked_by: []
 ---
 

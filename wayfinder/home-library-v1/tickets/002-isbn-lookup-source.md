@@ -2,7 +2,7 @@
 title: ISBN lookup source
 label: wayfinder:research
 status: open
-assignee:
+assignee: jazzysuit (research subagent)
 blocked_by: []
 ---
 
