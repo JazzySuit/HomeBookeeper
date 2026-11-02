@@ -28,11 +28,10 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - [Barcode scanning in the browser](tickets/003-barcode-scanning-in-the-browser.md): facts only. `barcode-detector` (native API with ZXing-WASM fallback) is the leading library; real-phone accuracy unknown; HTTPS is mandatory, with Tailscale or Caddy + domain as the home-server routes.
 - [ISBN lookup source](tickets/002-isbn-lookup-source.md): facts only. Open Library (no key) found all test ISBNs but NZ editions are incomplete; Google Books needs a key and was untested; no source gives binding/format.
 - [Household access model](tickets/004-household-access-model.md): LAN-only, no login, no identity, no roles; all Household members (adults and teens) can do everything.
+- [Choose the stack](tickets/008-choose-the-stack.md): ASP.NET Core Razor Pages + htmx 2.x on .NET 10 LTS, SQLite, `dotnet`-only toolchain (ADR 0001); runner-up Go + templ + htmx.
 
 ## Not yet specified
 
-- Solution layout and architecture: project structure, layering, how the domain model is expressed. Hangs on the stack choice.
-- Persistence and data model: storage engine, schema shape for Title and Copy, migrations.
 - Testing strategy: what gets tested at which level.
 - CI and deployment: build, test and release pipeline, tied to hosting.
 
