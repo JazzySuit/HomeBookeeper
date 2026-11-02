@@ -8,6 +8,10 @@ A household's record of the books it owns, where they are, what state they are i
 The single shared collection of one household: its Copies and its Wishlist.
 _Avoid_: Collection, catalogue
 
+**Household member**:
+A person in the household who uses the Library. All Household members are equal: anyone who can reach the Library can do everything.
+_Avoid_: User, account, member
+
 **Title**:
 A book as a published work: what it is (title, author, ISBN), independent of any physical item.
 _Avoid_: Book, edition, work

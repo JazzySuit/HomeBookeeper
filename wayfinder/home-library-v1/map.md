@@ -26,6 +26,8 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 
 - [Stack options cross-analysis](tickets/001-stack-options-cross-analysis.md): facts only. Viable field narrows to Blazor (Static SSR or WASM PWA), ASP.NET + htmx, Go + templ/htmx, SvelteKit; SAFE and PocketBase score weakest; scanning is stack-neutral.
 - [Barcode scanning in the browser](tickets/003-barcode-scanning-in-the-browser.md): facts only. `barcode-detector` (native API with ZXing-WASM fallback) is the leading library; real-phone accuracy unknown; HTTPS is mandatory, with Tailscale or Caddy + domain as the home-server routes.
+- [ISBN lookup source](tickets/002-isbn-lookup-source.md): facts only. Open Library (no key) found all test ISBNs but NZ editions are incomplete; Google Books needs a key and was untested; no source gives binding/format.
+- [Household access model](tickets/004-household-access-model.md): LAN-only, no login, no identity, no roles; all Household members (adults and teens) can do everything.
 
 ## Not yet specified
 
@@ -40,4 +42,5 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - Offline use: online-only for the first release.
 - Location finer than Room (shelves).
 - Multiple households / multi-tenancy.
+- Remote access, login, per-member identity and roles: not needed in v1 (see Household access model).
 - The implementation itself: this map ends at the handoff.
