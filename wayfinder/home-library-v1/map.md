@@ -29,6 +29,7 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - [ISBN lookup source](tickets/002-isbn-lookup-source.md): facts only. Open Library (no key) found all test ISBNs but NZ editions are incomplete; Google Books needs a key and was untested; no source gives binding/format.
 - [Household access model](tickets/004-household-access-model.md): LAN-only, no login, no identity, no roles; all Household members (adults and teens) can do everything.
 - [Choose the stack](tickets/008-choose-the-stack.md): ASP.NET Core Razor Pages + htmx 2.x on .NET 10 LTS, SQLite, `dotnet`-only toolchain (ADR 0001); runner-up Go + templ + htmx.
+- [Book types](tickets/006-book-types.md): one axis, Genre, on the Title (zero or one), with a Fiction/Non-fiction/Unspecified kind; household-editable list via inline create with autocomplete; rename and delete, no merge.
 
 ## Not yet specified
 
@@ -42,4 +43,5 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - Location finer than Room (shelves).
 - Multiple households / multi-tenancy.
 - Remote access, login, per-member identity and roles: not needed in v1 (see Household access model).
+- Format and audience axes, multiple Genres per Title, and Genre merge: not needed in v1 (see Book types).
 - The implementation itself: this map ends at the handoff.

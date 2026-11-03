@@ -15,4 +15,5 @@ How does the app talk to SQLite? Decide: data access approach (EF Core or altern
 ## Inputs so far
 
 - [Choose the stack](008-choose-the-stack.md): SQLite as a single file, engine fixed by ADR 0001.
-- Blocked on [Solution layout and architecture](011-solution-layout-and-architecture.md) (where persistence sits) and [Book types](006-book-types.md) (Title shape).
+- Blocked on [Solution layout and architecture](011-solution-layout-and-architecture.md) (where persistence sits).
+- [Book types](006-book-types.md): add Genre (name unique ignoring case, kind Fiction/Non-fiction/Unspecified) and an optional Genre reference from Title; deleting a Genre clears it on its Titles.

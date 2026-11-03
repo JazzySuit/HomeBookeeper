@@ -31,3 +31,11 @@ _Avoid_: State, quality
 **Wishlist**:
 The Titles the household wants but has no Copy of.
 _Avoid_: Wants, to-buy list
+
+**Genre**:
+The kind of content of a Title (e.g. Sci-fi, Science, Baby). A Title has at most one. The Household keeps the list of Genres.
+_Avoid_: Type, book type, category
+
+**Genre kind**:
+Whether a Genre is Fiction, Non-fiction or Unspecified. A Title's fiction or non-fiction comes from its Genre.
+_Avoid_: Fiction flag
