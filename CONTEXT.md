@@ -13,8 +13,8 @@ A person in the household who uses the Library. All Household members are equal:
 _Avoid_: User, account, member
 
 **Title**:
-A book as a published work: what it is (title, author, ISBN), independent of any physical item.
-_Avoid_: Book, edition, work
+A book as one published edition: what it is (title, authors, ISBN), independent of any physical item. Each format or edition (paperback, hardback, board book) is a separate Title.
+_Avoid_: Book, edition, work (a work spanning several editions is not modelled)
 
 **Copy**:
 A physical item on a shelf: one instance of a Title that the household owns.

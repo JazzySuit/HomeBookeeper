@@ -30,6 +30,7 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - [Household access model](tickets/004-household-access-model.md): LAN-only, no login, no identity, no roles; all Household members (adults and teens) can do everything.
 - [Choose the stack](tickets/008-choose-the-stack.md): ASP.NET Core Razor Pages + htmx 2.x on .NET 10 LTS, SQLite, `dotnet`-only toolchain (ADR 0001); runner-up Go + templ + htmx.
 - [Book types](tickets/006-book-types.md): one axis, Genre, on the Title (zero or one), with a Fiction/Non-fiction/Unspecified kind; household-editable list via inline create with autocomplete; rename and delete, no merge.
+- [First-release feature behaviour](tickets/005-first-release-feature-behaviour.md): Title is an edition (ISBN-13, optional, unique; title-match warning when absent), authors as a plain ordered list; Copies have Room, Condition (Good/Worn/Damaged), note and can be Gone; Open Library lookup with manual fallback and run mode; search by text, Genre, Room, Condition, author, owned/Wishlist, counting Titles.
 
 ## Not yet specified
 
