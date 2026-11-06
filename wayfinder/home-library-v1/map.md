@@ -32,10 +32,10 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - [Book types](tickets/006-book-types.md): one axis, Genre, on the Title (zero or one), with a Fiction/Non-fiction/Unspecified kind; household-editable list via inline create with autocomplete; rename and delete, no merge.
 - [First-release feature behaviour](tickets/005-first-release-feature-behaviour.md): Title is an edition (ISBN-13, optional, unique; title-match warning when absent), authors as a plain ordered list; Copies have Room, Condition (Good/Worn/Damaged), note and can be Gone; Open Library lookup with manual fallback and run mode; search by text, Genre, Room, Condition, author, owned/Wishlist, counting Titles.
 - [Solution layout and architecture](tickets/011-solution-layout-and-architecture.md): `Domain` + `Web` projects, no application layer; DDD tactics only on the Title aggregate (holds Copies and Wishlist state); writes via aggregate, reads via query classes; `Isbn`, Guid v7 typed ids, `Result<T>` factories; `IIsbnLookup` seam; no domain events (ADR 0002).
+- [Repo practices](tickets/007-repo-practices.md): `AGENTS.md` as source with `CLAUDE.md` importing it; ADRs superseded not edited; lean `.editorconfig` (tabs, Allman, file-scoped namespaces, LF), warnings and style fail the build; one slice = worktree + branch + PR, squash merge; plain imperative commits; agents never commit to `main` or merge.
 
 ## Not yet specified
 
-- Testing strategy: what gets tested at which level.
 - CI and deployment: build, test and release pipeline, tied to hosting.
 
 ## Out of scope
