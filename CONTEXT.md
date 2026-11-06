@@ -28,8 +28,12 @@ _Avoid_: Location, shelf, place
 The physical state of a Copy.
 _Avoid_: State, quality
 
+**Owned**:
+A Title with at least one Copy that is not Gone. A Title whose Copies are all Gone is not Owned.
+_Avoid_: In stock, held
+
 **Wishlist**:
-The Titles the household wants but has no Copy of.
+The Titles the household wants and does not own. A Title is never both Owned and on the Wishlist; gaining an Owned Copy takes it off.
 _Avoid_: Wants, to-buy list
 
 **Genre**:
