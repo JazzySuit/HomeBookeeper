@@ -2,7 +2,7 @@
 title: First-release feature behaviour
 label: wayfinder:grilling
 status: open
-assignee:
+assignee: jazzysuit
 blocked_by: [006]
 ---
 

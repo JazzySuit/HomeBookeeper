@@ -39,3 +39,7 @@ _Avoid_: Type, book type, category
 **Genre kind**:
 Whether a Genre is Fiction, Non-fiction or Unspecified. A Title's fiction or non-fiction comes from its Genre.
 _Avoid_: Fiction flag
+
+**Gone**:
+A Copy the household no longer has (given away, lost, worn out). It is kept as a record, not deleted, so the Library remembers it once owned the Title.
+_Avoid_: Deleted, archived, removed
