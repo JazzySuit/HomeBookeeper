@@ -33,10 +33,11 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - [First-release feature behaviour](tickets/005-first-release-feature-behaviour.md): Title is an edition (ISBN-13, optional, unique; title-match warning when absent), authors as a plain ordered list; Copies have Room, Condition (Good/Worn/Damaged), note and can be Gone; Open Library lookup with manual fallback and run mode; search by text, Genre, Room, Condition, author, owned/Wishlist, counting Titles.
 - [Solution layout and architecture](tickets/011-solution-layout-and-architecture.md): `Domain` + `Web` projects, no application layer; DDD tactics only on the Title aggregate (holds Copies and Wishlist state); writes via aggregate, reads via query classes; `Isbn`, Guid v7 typed ids, `Result<T>` factories; `IIsbnLookup` seam; no domain events (ADR 0002).
 - [Repo practices](tickets/007-repo-practices.md): `AGENTS.md` as source with `CLAUDE.md` importing it; ADRs superseded not edited; lean `.editorconfig` (tabs, Allman, file-scoped namespaces, LF), warnings and style fail the build; one slice = worktree + branch + PR, squash merge; plain imperative commits; agents never commit to `main` or merge.
+- [Choose hosting](tickets/009-choose-hosting.md): host-neutral home server (Windows now, Linux or Pi later, not always on); self-contained publish as Windows Service or systemd, no Docker; DHCP-reserved LAN IP over plain HTTP, DuckDNS + Caddy HTTPS only if scanning survives the spike; in-app daily SQLite snapshot to USB, 8-week retention; no ADR.
 
 ## Not yet specified
 
-- CI and deployment: build, test and release pipeline, tied to hosting.
+- Nothing currently.
 
 ## Out of scope
 
@@ -46,4 +47,5 @@ A first-release feature spec for a household home library web app (PWA, desktop 
 - Multiple households / multi-tenancy.
 - Remote access, login, per-member identity and roles: not needed in v1 (see Household access model).
 - Format and audience axes, multiple Genres per Title, and Genre merge: not needed in v1 (see Book types).
+- Buying or choosing host hardware, and off-site backups (OneDrive): not needed in v1 (see Choose hosting).
 - The implementation itself: this map ends at the handoff.
